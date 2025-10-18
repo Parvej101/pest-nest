@@ -98,8 +98,8 @@ const HeroSlider = () => {
           <circle
             className={styles.timer_circle}
             style={{ animationDuration: `${AUTOPLAY_DELAY}ms` }}
-            cx="24"
-            cy="24"
+            cx="26"
+            cy="26"
             r="20"
           ></circle>
         </svg>
