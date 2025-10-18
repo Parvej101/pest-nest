@@ -1,4 +1,5 @@
 import Categories from "@/components/home/Categories";
+import FeaturedProducts from "@/components/home/FeaturedProducts";
 import HeroSlider from "@/components/home/HeroSlider";
 
 export default function Home() {
@@ -6,6 +7,7 @@ export default function Home() {
   <div>
  <HeroSlider></HeroSlider>
  <Categories></Categories>
+ <FeaturedProducts></FeaturedProducts>
   </div>
   );
 }
