@@ -8,12 +8,13 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FaFilter } from "react-icons/fa";
+import { FiChevronDown } from "react-icons/fi";
 import { HiOutlineShoppingCart } from "react-icons/hi";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
-const ITEMS_PER_PAGE = 12; // প্রতি পেইজে ১২টি প্রোডাক্ট দেখাবে
+const ITEMS_PER_PAGE = 12;
 
-// --- ফিল্টার সাইডবার কম্পונেন্ট ---
+// --- ফিল্টার সাইডবার কম্পונেন্ট (সম্পূর্ণ কোড এখানে) ---
 const FilterSidebar = ({ products, onPriceChange, selectedPrice }) => {
   const categories = [
     ...new Set(products.map((p) => p.category).filter(Boolean)),
@@ -101,26 +102,38 @@ const ShopPage = () => {
   const searchTerm = searchParams.get("search");
   const [currentPage, setCurrentPage] = useState(1);
   const [price, setPrice] = useState(5000);
+  const [sortOption, setSortOption] = useState("newest");
 
-  const filteredProducts = useMemo(() => {
-    return allProducts.filter((product) => {
-      const matchesSearch = searchTerm
-        ? product.name.toLowerCase().includes(searchTerm.toLowerCase())
-        : true;
-      const matchesPrice = product.price <= price;
-      return matchesSearch && matchesPrice;
-    });
-  }, [searchTerm, price]);
+  const filteredAndSortedProducts = useMemo(() => {
+    let products = allProducts
+      .filter((p) => p.price <= price)
+      .filter((p) =>
+        searchTerm
+          ? p.name.toLowerCase().includes(searchTerm.toLowerCase())
+          : true
+      );
 
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const currentProducts = filteredProducts.slice(
+    switch (sortOption) {
+      case "price-asc":
+        return products.sort((a, b) => a.price - b.price);
+      case "price-desc":
+        return products.sort((a, b) => b.price - a.price);
+      default:
+        return products.sort((a, b) => b.id - a.id);
+    }
+  }, [searchTerm, price, sortOption]);
+
+  const totalPages = Math.ceil(
+    filteredAndSortedProducts.length / ITEMS_PER_PAGE
+  );
+  const currentProducts = filteredAndSortedProducts.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, price]);
+  }, [searchTerm, price, sortOption]);
 
   return (
     <div className="bg-base-100">
@@ -132,7 +145,7 @@ const ShopPage = () => {
                 Search Results for: "{searchTerm}"
               </h1>
               <p className="mt-2 text-base-content/70">
-                {filteredProducts.length} products found
+                {filteredAndSortedProducts.length} products found
               </p>
             </div>
           ) : (
@@ -159,15 +172,58 @@ const ShopPage = () => {
                 -
                 {Math.min(
                   currentPage * ITEMS_PER_PAGE,
-                  filteredProducts.length
+                  filteredAndSortedProducts.length
                 )}{" "}
-                of {filteredProducts.length}
+                of {filteredAndSortedProducts.length}
               </p>
               <div className="flex items-center gap-2">
-                <select className="select select-bordered select-sm">
-                  <option>Sort by: Newest</option>
-                  <option>Sort by: Price (Low to High)</option>
-                </select>
+                <div className="dropdown dropdown-end">
+                  <div
+                    tabIndex={0}
+                    role="button"
+                    className="btn btn-outline btn-sm m-1 flex items-center gap-2"
+                  >
+                    {sortOption === "newest" && "Sort by: Newest"}
+                    {sortOption === "price-asc" &&
+                      "Sort by: Price (Low to High)"}
+                    {sortOption === "price-desc" &&
+                      "Sort by: Price (High to Low)"}
+                    <FiChevronDown />
+                  </div>
+                  <ul
+                    tabIndex={0}
+                    className="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52"
+                  >
+                    <li>
+                      <a
+                        onClick={() => setSortOption("newest")}
+                        className={sortOption === "newest" ? "font-bold" : ""}
+                      >
+                        Newest
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        onClick={() => setSortOption("price-asc")}
+                        className={
+                          sortOption === "price-asc" ? "font-bold" : ""
+                        }
+                      >
+                        Price (Low to High)
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        onClick={() => setSortOption("price-desc")}
+                        className={
+                          sortOption === "price-desc" ? "font-bold" : ""
+                        }
+                      >
+                        Price (High to Low)
+                      </a>
+                    </li>
+                  </ul>
+                </div>
                 <label
                   htmlFor="mobile-filter-drawer"
                   className="btn btn-ghost btn-circle lg:hidden"
