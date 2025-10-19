@@ -5,34 +5,32 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FiHeart, FiUser } from "react-icons/fi";
 import { HiOutlineMenuAlt1, HiOutlineShoppingCart } from "react-icons/hi";
 import { IoClose, IoSearchOutline } from "react-icons/io5";
 
 function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   const { push } = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentSearch = searchParams.get("search") || "";
+  const modalRef = useRef(null);
 
   const handleSearchChange = (e) => {
     const searchTerm = e.target.value;
     const params = new URLSearchParams(window.location.search);
-
     if (searchTerm) {
       params.set("search", searchTerm);
     } else {
       params.delete("search");
     }
-
-    // শুধুমাত্র Shop পেইজে থাকলেই URL পরিবর্তন করো
     if (pathname === "/shop") {
       push(`/shop?${params.toString()}`);
     }
   };
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const searchTerm = e.target.elements.search.value;
@@ -41,6 +39,9 @@ function Navbar() {
       params.set("search", searchTerm);
     }
     push(`/shop?${params.toString()}`);
+    if (modalRef.current) {
+      modalRef.current.close();
+    }
   };
 
   return (
@@ -88,7 +89,10 @@ function Navbar() {
               </ul>
             </div>
             <div className="navbar-end flex items-center gap-1">
-              <button className="btn btn-ghost btn-circle lg:hidden">
+              <button
+                onClick={() => modalRef.current.showModal()}
+                className="btn btn-ghost btn-circle lg:hidden"
+              >
                 <IoSearchOutline className="h-6 w-6" />
               </button>
               <button className="btn btn-ghost btn-circle lg:hidden">
@@ -108,7 +112,7 @@ function Navbar() {
                     type="text"
                     name="search"
                     placeholder="Search..."
-                    className="input input-bordered w-48 h-10 pl-10 text-gray-700"
+                    className="input input-bordered w-60 h-10 pl-10 text-white bg-gray-700"
                     onChange={handleSearchChange}
                     defaultValue={pathname === "/shop" ? currentSearch : ""}
                   />
@@ -116,7 +120,7 @@ function Navbar() {
                     type="submit"
                     className="absolute inset-y-0 left-0 flex items-center pl-3"
                   >
-                    <IoSearchOutline className="w-5 h-5 text-gray-500" />
+                    <IoSearchOutline className="w-5 h-5 text-gray-400" />
                   </button>
                 </form>
                 <button className="btn btn-ghost btn-circle">
@@ -252,6 +256,33 @@ function Navbar() {
           </ul>
         </div>
       </div>
+
+      {/* --- মোবাইল সার্চ Modal --- */}
+      <dialog ref={modalRef} className="modal modal-bottom sm:modal-middle">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg mb-4">Search for Products</h3>
+          <form onSubmit={handleSearchSubmit} className="form-control relative">
+            <input
+              type="text"
+              name="search"
+              placeholder="Type to search..."
+              className="input input-bordered w-full pl-10"
+              autoFocus
+            />
+            <button
+              type="submit"
+              className="absolute inset-y-0 left-0 flex items-center pl-3"
+            >
+              <IoSearchOutline className="w-5 h-5" />
+            </button>
+          </form>
+          <div className="modal-action">
+            <form method="dialog">
+              <button className="btn">Close</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
     </div>
   );
 }
