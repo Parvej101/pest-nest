@@ -5,13 +5,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { FiHeart, FiUser } from "react-icons/fi"; // Wishlist & User Icons
+import { FiHeart, FiUser } from "react-icons/fi";
 import { HiOutlineMenuAlt1, HiOutlineShoppingCart } from "react-icons/hi";
 import { IoClose, IoSearchOutline } from "react-icons/io5";
 
 function Navbar() {
-  // ডেমোর জন্য, আমরা একটি state ব্যবহার করছি লগইন স্ট্যাটাস ট্র্যাক করার জন্য
-  // প্রাথমিকভাবে ব্যবহারকারী লগইন করা নেই (false)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
@@ -21,7 +19,7 @@ function Navbar() {
 
       {/* Page Content (including the visible navbar) */}
       <div className="drawer-content flex flex-col">
-        <header className="bg-base-100 border-b border-base-200 sticky top-0 z-30">
+        <header className="bg-gray-200 border-b border-gray-200 sticky top-0 z-30 text-gray-700">
           <div className="navbar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* START: Hamburger (Mobile) / Logo (Desktop) */}
             <div className="navbar-start">
@@ -66,9 +64,9 @@ function Navbar() {
             </div>
 
             {/* END: Icons */}
-            <div className="navbar-end flex items-center gap-1">
+            <div className="navbar-end flex items-center gap-1 ">
               {/* --- Mobile Icons --- */}
-              <button className="btn btn-ghost btn-circle lg:hidden">
+              <button className="btn btn-ghost btn-circle lg:hidden ">
                 <IoSearchOutline className="h-6 w-6" />
               </button>
               <button className="btn btn-ghost btn-circle lg:hidden">
@@ -81,15 +79,15 @@ function Navbar() {
               </button>
 
               {/* --- Desktop Icons & Search Bar --- */}
-              <div className="hidden lg:flex items-center gap-2">
-                <div className="form-control relative">
+              <div className="hidden lg:flex items-center gap-2 ">
+                <div className="form-control relative text-white">
                   <input
                     type="text"
                     placeholder="Search..."
-                    className="input input-bordered w-48 h-10 pl-10"
+                    className="input input-bordered  w-48 h-10 pl-10"
                   />
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <IoSearchOutline className="w-5 h-5 text-gray-400" />
+                    <IoSearchOutline className="w-5 h-5 text-white" />
                   </div>
                 </div>
                 <button className="btn btn-ghost btn-circle">
@@ -117,7 +115,7 @@ function Navbar() {
                         />
                       </div>
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
                         <FiUser className="h-5 w-5" />
                       </div>
                     )}

@@ -48,7 +48,7 @@ const HeroSlider = () => {
   };
 
   return (
-    <div className="w-full relative">
+    <div className="w-full relative mt-8">
       <div
         ref={carouselRef}
         className="carousel w-full aspect-video rounded-box"
@@ -67,9 +67,9 @@ const HeroSlider = () => {
               priority={index === 0}
             />
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center  text-white p-4">
-              <h2 className="text-2xl md:text-4xl font-bold mb-4 text-center">
+              {/* <h2 className="text-2xl md:text-4xl font-bold mb-4 text-center">
                 Your Pet's Happiness Starts Here
-              </h2>
+              </h2> */}
               <button className="btn btn-primary">Shop Now</button>
             </div>
           </div>

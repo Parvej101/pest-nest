@@ -61,10 +61,10 @@ const FeaturedProducts = () => {
     <section className="py-12 md:py-16 bg-base-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight">
+          <h2 className="lg:text-3xl text-xl font-bold tracking-tight">
             Top Selling Products
           </h2>
-          <p className="text-base-content/70 mt-2">
+          <p className="lg:text-base-content/70 mt-2 text-sm">
             Handpicked selection of our best products
           </p>
         </div>
