@@ -70,7 +70,9 @@ const HeroSlider = () => {
               {/* <h2 className="text-2xl md:text-4xl font-bold mb-4 text-center">
                 Your Pet's Happiness Starts Here
               </h2> */}
-              <button className="btn btn-primary">Shop Now</button>
+              <button className="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg xl:btn-xl  btn-warning text-white ">
+                Shop Now
+              </button>
             </div>
           </div>
         ))}

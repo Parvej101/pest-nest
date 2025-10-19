@@ -33,8 +33,8 @@ function Navbar() {
                 <Image
                   src="/images/logo.png"
                   alt="PetNest Logo"
-                  width={120}
-                  height={40}
+                  width={80}
+                  height={80}
                   priority
                 />
               </Link>

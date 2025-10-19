@@ -1,5 +1,6 @@
 
 import Announcement from '@/components/layout/Annoucement';
+import ContactFAB from '@/components/layout/ContactFAB';
 import Navbar from '@/components/layout/Navbar';
 import { Inter } from 'next/font/google';
 import './globals.css';
@@ -15,6 +16,7 @@ export default function RootLayout({ children }) {
           <Announcement/>
           <Navbar />
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">{children}</main>
+          <ContactFAB></ContactFAB>
       
       </body>
     </html>

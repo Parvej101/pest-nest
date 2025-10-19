@@ -58,7 +58,7 @@ const productsData = [
 
 const FeaturedProducts = () => {
   return (
-    <section className="py-12 md:py-16 bg-base-100">
+    <section className="pb-12 md:pb-16 bg-base-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="lg:text-3xl text-xl font-bold tracking-tight">
