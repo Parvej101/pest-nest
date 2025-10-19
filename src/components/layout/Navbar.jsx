@@ -4,6 +4,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { FiHeart, FiUser } from "react-icons/fi";
 import { HiOutlineMenuAlt1, HiOutlineShoppingCart } from "react-icons/hi";
@@ -12,16 +13,42 @@ import { IoClose, IoSearchOutline } from "react-icons/io5";
 function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const { push } = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentSearch = searchParams.get("search") || "";
+
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value;
+    const params = new URLSearchParams(window.location.search);
+
+    if (searchTerm) {
+      params.set("search", searchTerm);
+    } else {
+      params.delete("search");
+    }
+
+    // শুধুমাত্র Shop পেইজে থাকলেই URL পরিবর্তন করো
+    if (pathname === "/shop") {
+      push(`/shop?${params.toString()}`);
+    }
+  };
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const searchTerm = e.target.elements.search.value;
+    const params = new URLSearchParams();
+    if (searchTerm) {
+      params.set("search", searchTerm);
+    }
+    push(`/shop?${params.toString()}`);
+  };
+
   return (
     <div className="drawer">
-      {/* Drawer Checkbox (hidden) */}
       <input id="mobile-drawer" type="checkbox" className="drawer-toggle" />
-
-      {/* Page Content (including the visible navbar) */}
       <div className="drawer-content flex flex-col">
         <header className="bg-gray-200 border-b border-gray-200 sticky top-0 z-30 text-gray-700">
           <div className="navbar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* START: Hamburger (Mobile) / Logo (Desktop) */}
             <div className="navbar-start">
               <label
                 htmlFor="mobile-drawer"
@@ -39,8 +66,6 @@ function Navbar() {
                 />
               </Link>
             </div>
-
-            {/* CENTER: Logo (Mobile) / Desktop Menu */}
             <div className="navbar-center">
               <Link href="/" className="lg:hidden">
                 <Image
@@ -62,11 +87,8 @@ function Navbar() {
                 </li>
               </ul>
             </div>
-
-            {/* END: Icons */}
-            <div className="navbar-end flex items-center gap-1 ">
-              {/* --- Mobile Icons --- */}
-              <button className="btn btn-ghost btn-circle lg:hidden ">
+            <div className="navbar-end flex items-center gap-1">
+              <button className="btn btn-ghost btn-circle lg:hidden">
                 <IoSearchOutline className="h-6 w-6" />
               </button>
               <button className="btn btn-ghost btn-circle lg:hidden">
@@ -77,19 +99,26 @@ function Navbar() {
                   </span>
                 </div>
               </button>
-
-              {/* --- Desktop Icons & Search Bar --- */}
-              <div className="hidden lg:flex items-center gap-2 ">
-                <div className="form-control relative text-white">
+              <div className="hidden lg:flex items-center gap-2">
+                <form
+                  onSubmit={handleSearchSubmit}
+                  className="form-control relative"
+                >
                   <input
                     type="text"
+                    name="search"
                     placeholder="Search..."
-                    className="input input-bordered  w-48 h-10 pl-10"
+                    className="input input-bordered w-48 h-10 pl-10 text-gray-700"
+                    onChange={handleSearchChange}
+                    defaultValue={pathname === "/shop" ? currentSearch : ""}
                   />
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <IoSearchOutline className="w-5 h-5 text-white" />
-                  </div>
-                </div>
+                  <button
+                    type="submit"
+                    className="absolute inset-y-0 left-0 flex items-center pl-3"
+                  >
+                    <IoSearchOutline className="w-5 h-5 text-gray-500" />
+                  </button>
+                </form>
                 <button className="btn btn-ghost btn-circle">
                   <FiHeart className="h-6 w-6" />
                 </button>
@@ -153,24 +182,19 @@ function Navbar() {
           </div>
         </header>
       </div>
-
-      {/* Drawer Side Panel (The slide-out menu) */}
-      <div className="drawer-side z-40 ">
+      <div className="drawer-side z-40">
         <label
           htmlFor="mobile-drawer"
           aria-label="close sidebar"
           className="drawer-overlay"
         ></label>
         <div className="menu p-4 w-64 min-h-full bg-base-100">
-          {/* Drawer Header */}
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold">MENU</h2>
             <label htmlFor="mobile-drawer" className="btn btn-ghost btn-circle">
               <IoClose className="h-6 w-6" />
             </label>
           </div>
-
-          {/* Menu Items */}
           <ul className="space-y-1 text-lg">
             <li>
               <Link href="/shop">Shop All</Link>
@@ -206,11 +230,7 @@ function Navbar() {
                 </ul>
               </details>
             </li>
-
-            {/* Divider */}
             <div className="divider my-4"></div>
-
-            {/* Wishlist & Account Links */}
             <li>
               <Link href="/wishlist" className="flex items-center gap-3">
                 <FiHeart /> My Wishlist

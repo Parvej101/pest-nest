@@ -1,62 +1,12 @@
-// src/components/home/FeaturedProducts.jsx
-
 "use client";
 
+import { allProducts } from "@/data/products";
 import Image from "next/image";
 import Link from "next/link";
 import { HiOutlineShoppingCart } from "react-icons/hi";
 
-// --- আপনার দেওয়া নতুন ডেমো ডেটা ---
-const productsData = [
-  {
-    id: 1,
-    name: "Cat Food",
-    imageSrc: "/images/products/pet food 1.jpg",
-    price: 250,
-    oldPrice: 300,
-    slug: "Catfood",
-  },
-  {
-    id: 2,
-    name: "Purina Friskies Indoor",
-    imageSrc: "/images/products/pet food 2.jpg",
-    price: 1200,
-    slug: "purina-friskies-indoor",
-  },
-  {
-    id: 3,
-    name: "Premium Cat Food",
-    imageSrc: "/images/products/catfood2.jpg",
-    price: 950,
-    slug: "meo-cat-food-tuna",
-  },
-  {
-    id: 4,
-    name: "SmartHeart Puppy Pack",
-    imageSrc: "/images/products/cat food3.jpg",
-    price: 1500,
-    oldPrice: 1650,
-    slug: "smartheart-power-pack",
-  },
-  {
-    id: 5,
-    name: "Cozy Cat Bed",
-    imageSrc: "/images/products/bed.jpg",
-    price: 1500,
-    oldPrice: 1650,
-    slug: "bed",
-  },
-  {
-    id: 6,
-    name: "Airline Approved Carrier",
-    imageSrc: "/images/products/carrier.jpg",
-    price: 1500,
-    oldPrice: 1650,
-    slug: "bag",
-  },
-];
-
 const FeaturedProducts = () => {
+  const featuredProducts = allProducts.filter((p) => p.isFeatured).slice(0, 8);
   return (
     <section className="pb-12 md:pb-16 bg-base-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -64,13 +14,13 @@ const FeaturedProducts = () => {
           <h2 className="lg:text-3xl text-xl font-bold tracking-tight">
             Top Selling Products
           </h2>
-          <p className="lg:text-base-content/70 mt-2 text-sm">
-            Handpicked selection of our best products
-          </p>
+          <Link href="/shop" className="btn btn-link btn-primary mt-2">
+            Shop More <span aria-hidden="true">→</span>
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-10">
-          {productsData.map((product) => (
+          {featuredProducts.map((product) => (
             <div key={product.id} className="group">
               <div className="card card-compact bg-transparent p-0">
                 {/* ছবির অংশ (3:4 অনুপাত) */}
