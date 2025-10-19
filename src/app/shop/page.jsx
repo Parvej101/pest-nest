@@ -14,7 +14,7 @@ import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
 const ITEMS_PER_PAGE = 12;
 
-// --- ফিল্টার সাইডবার কম্পונেন্ট (সম্পূর্ণ কোড এখানে) ---
+// --- ফিল্টার সাইডবার কম্পונেন্ট (এই ফাইলের ভেতরেই রাখা হয়েছে) ---
 const FilterSidebar = ({ products, onPriceChange, selectedPrice }) => {
   const categories = [
     ...new Set(products.map((p) => p.category).filter(Boolean)),
@@ -23,7 +23,6 @@ const FilterSidebar = ({ products, onPriceChange, selectedPrice }) => {
 
   return (
     <div className="space-y-8">
-      {/* Category Filter */}
       {categories.length > 0 && (
         <div>
           <h3 className="font-semibold mb-3 text-lg">Categories</h3>
@@ -42,8 +41,6 @@ const FilterSidebar = ({ products, onPriceChange, selectedPrice }) => {
           </div>
         </div>
       )}
-
-      {/* Price Range Filter */}
       <div>
         <h3 className="font-semibold mb-3 text-lg">Price Range</h3>
         <input
@@ -62,8 +59,6 @@ const FilterSidebar = ({ products, onPriceChange, selectedPrice }) => {
           <span>৳5000</span>
         </div>
       </div>
-
-      {/* Brand Filter */}
       {brands.length > 0 && (
         <div>
           <h3 className="font-semibold mb-3 text-lg">Brands</h3>
@@ -82,8 +77,6 @@ const FilterSidebar = ({ products, onPriceChange, selectedPrice }) => {
           </div>
         </div>
       )}
-
-      {/* Stock Filter */}
       <div>
         <div className="form-control mt-4">
           <label className="label cursor-pointer justify-start gap-3">
@@ -112,14 +105,13 @@ const ShopPage = () => {
           ? p.name.toLowerCase().includes(searchTerm.toLowerCase())
           : true
       );
-
     switch (sortOption) {
       case "price-asc":
-        return products.sort((a, b) => a.price - b.price);
+        return [...products].sort((a, b) => a.price - b.price);
       case "price-desc":
-        return products.sort((a, b) => b.price - a.price);
+        return [...products].sort((a, b) => b.price - a.price);
       default:
-        return products.sort((a, b) => b.id - a.id);
+        return [...products].sort((a, b) => b.id - a.id);
     }
   }, [searchTerm, price, sortOption]);
 
@@ -130,6 +122,12 @@ const ShopPage = () => {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
+  const showingText = `Showing ${
+    currentProducts.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0
+  }-${Math.min(
+    currentPage * ITEMS_PER_PAGE,
+    filteredAndSortedProducts.length
+  )} of ${filteredAndSortedProducts.length}`;
 
   useEffect(() => {
     setCurrentPage(1);
@@ -138,19 +136,72 @@ const ShopPage = () => {
   return (
     <div className="bg-base-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-10">
-          {searchTerm ? (
+        {/* --- মূল পরিবর্তন: রেসপন্সিভ শিরোনাম এবং কন্ট্রোল বার --- */}
+        <div className="mb-8 lg:mb-10">
+          <div className="flex justify-between items-baseline mb-4">
             <div>
-              <h1 className="text-3xl font-bold">
-                Search Results for: "{searchTerm}"
-              </h1>
-              <p className="mt-2 text-base-content/70">
-                {filteredAndSortedProducts.length} products found
-              </p>
+              {searchTerm ? (
+                <h1 className="text-3xl font-bold">Search: "{searchTerm}"</h1>
+              ) : (
+                <h1 className="text-4xl font-bold tracking-tight">Shop All</h1>
+              )}
             </div>
-          ) : (
-            <h1 className="text-4xl font-bold tracking-tight">Shop All</h1>
-          )}
+            {/* "Showing..." লেখাটি শুধুমাত্র মোবাইলে এখানে দেখা যাবে */}
+            <p className="text-sm text-base-content/70 lg:hidden">
+              {showingText}
+            </p>
+          </div>
+
+          {/* কন্ট্রোল বার (শুধুমাত্র মোবাইলে এখানে দেখা যাবে) */}
+          <div className="flex justify-between items-center lg:hidden">
+            <div className="dropdown">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-outline btn-sm m-1 flex items-center gap-1"
+              >
+                {sortOption === "newest" && "Sort by: Newest"}
+                {sortOption === "price-asc" && "Price (Low-High)"}
+                {sortOption === "price-desc" && "Price (High-Low)"}
+                <FiChevronDown />
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52"
+              >
+                <li>
+                  <a
+                    onClick={() => setSortOption("newest")}
+                    className={sortOption === "newest" ? "font-bold" : ""}
+                  >
+                    Newest
+                  </a>
+                </li>
+                <li>
+                  <a
+                    onClick={() => setSortOption("price-asc")}
+                    className={sortOption === "price-asc" ? "font-bold" : ""}
+                  >
+                    Price (Low to High)
+                  </a>
+                </li>
+                <li>
+                  <a
+                    onClick={() => setSortOption("price-desc")}
+                    className={sortOption === "price-desc" ? "font-bold" : ""}
+                  >
+                    Price (High to Low)
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <label
+              htmlFor="mobile-filter-drawer"
+              className="btn btn-ghost btn-circle"
+            >
+              <FaFilter />
+            </label>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-x-8 gap-y-10">
@@ -163,73 +214,49 @@ const ShopPage = () => {
           </aside>
 
           <main className="lg:col-span-3">
-            <div className="flex justify-between items-center mb-6">
-              <p className="text-sm text-base-content/70">
-                Showing{" "}
-                {currentProducts.length > 0
-                  ? (currentPage - 1) * ITEMS_PER_PAGE + 1
-                  : 0}
-                -
-                {Math.min(
-                  currentPage * ITEMS_PER_PAGE,
-                  filteredAndSortedProducts.length
-                )}{" "}
-                of {filteredAndSortedProducts.length}
-              </p>
-              <div className="flex items-center gap-2">
-                <div className="dropdown dropdown-end">
-                  <div
-                    tabIndex={0}
-                    role="button"
-                    className="btn btn-outline btn-sm m-1 flex items-center gap-2"
-                  >
-                    {sortOption === "newest" && "Sort by: Newest"}
-                    {sortOption === "price-asc" &&
-                      "Sort by: Price (Low to High)"}
-                    {sortOption === "price-desc" &&
-                      "Sort by: Price (High to Low)"}
-                    <FiChevronDown />
-                  </div>
-                  <ul
-                    tabIndex={0}
-                    className="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52"
-                  >
-                    <li>
-                      <a
-                        onClick={() => setSortOption("newest")}
-                        className={sortOption === "newest" ? "font-bold" : ""}
-                      >
-                        Newest
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        onClick={() => setSortOption("price-asc")}
-                        className={
-                          sortOption === "price-asc" ? "font-bold" : ""
-                        }
-                      >
-                        Price (Low to High)
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        onClick={() => setSortOption("price-desc")}
-                        className={
-                          sortOption === "price-desc" ? "font-bold" : ""
-                        }
-                      >
-                        Price (High to Low)
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <label
-                  htmlFor="mobile-filter-drawer"
-                  className="btn btn-ghost btn-circle lg:hidden"
+            <div className="hidden lg:flex justify-between items-center mb-6">
+              <p className="text-sm text-base-content/70">{showingText}</p>
+              <div className="dropdown dropdown-end">
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="btn btn-outline btn-sm m-1 flex items-center gap-2"
                 >
-                  <FaFilter />
-                </label>
+                  {sortOption === "newest" && "Sort by: Newest"}
+                  {sortOption === "price-asc" && "Sort by: Price (Low to High)"}
+                  {sortOption === "price-desc" &&
+                    "Sort by: Price (High to Low)"}
+                  <FiChevronDown />
+                </div>
+                <ul
+                  tabIndex={0}
+                  className="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52"
+                >
+                  <li>
+                    <a
+                      onClick={() => setSortOption("newest")}
+                      className={sortOption === "newest" ? "font-bold" : ""}
+                    >
+                      Newest
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      onClick={() => setSortOption("price-asc")}
+                      className={sortOption === "price-asc" ? "font-bold" : ""}
+                    >
+                      Price (Low to High)
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      onClick={() => setSortOption("price-desc")}
+                      className={sortOption === "price-desc" ? "font-bold" : ""}
+                    >
+                      Price (High to Low)
+                    </a>
+                  </li>
+                </ul>
               </div>
             </div>
 
@@ -328,7 +355,7 @@ const ShopPage = () => {
             aria-label="close sidebar"
             className="drawer-overlay"
           ></label>
-          <div className="p-4 w-80 min-h-full bg-base-100">
+          <div className="p-4 w-60 min-h-full bg-base-100">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Filter Products</h2>
               <label
