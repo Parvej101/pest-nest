@@ -19,7 +19,7 @@ const TrendingProducts = () => {
           </Link>
         </div>
 
-        {/* --- নতুন এবং আধুনিক প্রোডাক্ট কার্ডের গ্রিড --- */}
+        {/* ---  প্রোডাক্ট কার্ডের গ্রিড --- */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-8 md:gap-x-6">
           {trendingProducts.map((product) => (
             <div key={product.id} className="group">
@@ -34,7 +34,7 @@ const TrendingProducts = () => {
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   {/* Sale বা Discount Badge */}
-                  {product.saleBadge && (
+                  {/* {product.saleBadge && (
                     <div className="badge badge-secondary absolute top-2 right-2">
                       {product.saleBadge}
                     </div>
@@ -43,7 +43,7 @@ const TrendingProducts = () => {
                     <div className="badge badge-accent absolute top-2 right-2">
                       {product.discountBadge}
                     </div>
-                  )}
+                  )} */}
                 </div>
               </Link>
 

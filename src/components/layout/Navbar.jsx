@@ -33,6 +33,7 @@ function Navbar() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+    // এখন এটি ডেস্কটপ এবং মোবাইল—উভয় ফর্মের জন্যই কাজ করবে
     const searchTerm = e.target.elements.search.value;
     const params = new URLSearchParams();
     if (searchTerm) {
@@ -110,7 +111,7 @@ function Navbar() {
                 >
                   <input
                     type="text"
-                    name="search"
+                    name="search" // <-- নাম: "search"
                     placeholder="Search..."
                     className="input input-bordered w-60 h-10 pl-10 text-white bg-gray-700"
                     onChange={handleSearchChange}
@@ -258,13 +259,13 @@ function Navbar() {
       </div>
 
       {/* --- মোবাইল সার্চ Modal --- */}
-      <dialog ref={modalRef} className="modal modal-bottom sm:modal-middle">
-        <div className="modal-box">
+      <dialog ref={modalRef} className="modal modal-top">
+        <div className="modal-box rounded-t-none">
           <h3 className="font-bold text-lg mb-4">Search for Products</h3>
           <form onSubmit={handleSearchSubmit} className="form-control relative">
             <input
               type="text"
-              name="search"
+              name="search" // <-- মূল পরিবর্তন: নাম "search" করা হয়েছে
               placeholder="Type to search..."
               className="input input-bordered w-full pl-10"
               autoFocus
