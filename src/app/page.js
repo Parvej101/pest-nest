@@ -4,6 +4,7 @@ import HeroSlider from "@/components/home/HeroSlider";
 import TrendingProducts from "@/components/home/TrendingProducts";
 import VideoShowcase from "@/components/home/VideoShowcase";
 
+
 export default function Home() {
   return (
   <div>
@@ -13,6 +14,7 @@ export default function Home() {
  {/* <PromoBanners></PromoBanners> */}
  <VideoShowcase></VideoShowcase>
  <TrendingProducts></TrendingProducts>
+
   </div>
   );
 }

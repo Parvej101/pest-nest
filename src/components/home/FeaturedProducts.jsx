@@ -1,12 +1,12 @@
 "use client";
 
+import ProductCard from "@/components/shared/ProductCard"; // ধাপ ১: ProductCard কম্পোনেন্ট ইম্পোর্ট করা হয়েছে
 import { allProducts } from "@/data/products";
-import Image from "next/image";
 import Link from "next/link";
-import { HiOutlineShoppingCart } from "react-icons/hi";
 
 const FeaturedProducts = () => {
   const featuredProducts = allProducts.filter((p) => p.isFeatured).slice(0, 8);
+
   return (
     <section className="pb-12 md:pb-16 bg-base-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,43 +21,8 @@ const FeaturedProducts = () => {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-10">
           {featuredProducts.map((product) => (
-            <div key={product.id} className="group">
-              <div className="card card-compact bg-transparent p-0">
-                {/* ছবির অংশ (3:4 অনুপাত) */}
-                <Link href={`/product/${product.slug}`}>
-                  <figure className="relative w-full aspect-[3/4] rounded-lg overflow-hidden bg-base-200 group-hover:shadow-xl transition-shadow duration-300">
-                    <Image
-                      src={product.imageSrc}
-                      alt={product.name}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                  </figure>
-                </Link>
-                {/* কন্টেন্টের অংশ */}
-                <div className="mt-3 text-left">
-                  <h3 className="text-sm md:text-base font-semibold truncate">
-                    {product.name}
-                  </h3>
-                  <div className="mt-2 flex justify-between items-center">
-                    <div className="flex items-baseline gap-2">
-                      <p className="font-bold text-primary text-base md:text-lg">
-                        ৳{product.price}
-                      </p>
-                      {product.oldPrice && (
-                        <p className="line-through text-base-content/50 text-xs md:text-sm">
-                          ৳{product.oldPrice}
-                        </p>
-                      )}
-                    </div>
-                    <button className="btn btn-primary btn-sm btn-circle">
-                      <HiOutlineShoppingCart className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            // ধাপ ২: map ফাংশনের ভেতরের পুরো কার্ডের কোডটি <ProductCard /> দিয়ে রিপ্লেস করা হয়েছে
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </div>

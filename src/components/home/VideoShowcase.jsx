@@ -30,7 +30,6 @@ const VideoShowcase = () => {
           <iframe
             src={videoSrc}
             title="YouTube video player"
-            frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             className="absolute top-0 left-0 w-full h-full"
@@ -39,13 +38,13 @@ const VideoShowcase = () => {
           {/* বাটন (এটি iframe-এর উপরে থাকবে) */}
         </div>
         <div className=" z-10 m-auto text-center py-8  ">
-          <Link href={videoData.buttonHref}>
-            <Link href="/shop">
-              <button className="btn btn-outline btn-primary animate-pulse rounded-full px-8">
-                Shop This Products
-              </button>
-            </Link>
+          {/* <Link href={videoData.buttonHref}> */}
+          <Link href="/shop">
+            <button className="btn btn-outline btn-primary animate-pulse rounded-full px-8">
+              Shop This Products
+            </button>
           </Link>
+          {/* </Link> */}
         </div>
       </div>
     </section>
