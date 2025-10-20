@@ -40,9 +40,11 @@ const VideoShowcase = () => {
         </div>
         <div className=" z-10 m-auto text-center py-8  ">
           <Link href={videoData.buttonHref}>
-            <button className="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg xl:btn-xl  btn-outline btn-warning animate-pulse ">
-              Click Here Buy This Product
-            </button>
+            <Link href="/shop">
+              <button className="btn btn-outline btn-primary animate-pulse rounded-full px-8">
+                Shop This Products
+              </button>
+            </Link>
           </Link>
         </div>
       </div>
