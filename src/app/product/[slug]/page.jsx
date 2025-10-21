@@ -1,11 +1,10 @@
-// src/app/product/[slug]/page.jsx
 "use client";
 
 import { allProducts } from "@/data/products";
 import Link from "next/link";
 import { HiOutlineChevronRight } from "react-icons/hi";
 
-// কম্পোনেন্ট ইম্পোর্ট
+// আমাদের বানানো ছোট ছোট কম্পোনেন্টগুলো ইম্পোর্ট করা হচ্ছে
 import ProductCard from "@/components/shared/ProductCard";
 import ProductImageGallery from "./components/ProductImageGallery";
 import ProductInfo from "./components/ProductInfo";
@@ -15,7 +14,9 @@ const ProductDetailsPage = ({ params }) => {
   const product = allProducts.find((p) => p.slug === slug);
 
   // সবচেয়ে গুরুত্বপূর্ণ: product আছে কিনা তা প্রথমেই চেক করা হচ্ছে
+  // এটি একটি "গেটকিপার"-এর মতো কাজ করে
   if (!product) {
+    // যদি কোনো প্রোডাক্ট খুঁজে না পাওয়া যায়, তাহলে এখান থেকেই একটি মেসেজ দেখিয়ে কোড শেষ হয়ে যাবে
     return (
       <div className="flex items-center justify-center h-screen">
         <h1 className="text-2xl font-bold">
@@ -25,7 +26,8 @@ const ProductDetailsPage = ({ params }) => {
     );
   }
 
-  // যদি product পাওয়া যায়, তবেই বাকি কোড চলবে
+  // যদি ওপরের if-check পাস হয়, তার মানে product নিশ্চিতভাবে পাওয়া গেছে
+  // এখন আমরা নিরাপদে বাকি কাজগুলো করতে পারি
   const relatedProducts = allProducts
     .filter((p) => p.category === product.category && p.slug !== slug)
     .slice(0, 5);
@@ -33,7 +35,7 @@ const ProductDetailsPage = ({ params }) => {
   const breadcrumbs = [
     { name: "Home", href: "/" },
     { name: "Shop", href: "/shop" },
-    { name: product.name, href: `/product/${slug}` },
+    { name: product.name, href: `/product/${slug}` }, // এখন এটি নিরাপদ
   ];
 
   return (

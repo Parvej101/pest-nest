@@ -15,7 +15,7 @@ const VideoShowcase = () => {
   const videoSrc = `https://www.youtube.com/embed/${videoData.youtubeVideoId}?autoplay=1&mute=1&loop=1&playlist=${videoData.youtubeVideoId}&controls=1&fs=0&showinfo=0&modestbranding=1&rel=0`;
 
   return (
-    <section className="lg:py-12 py-5 ">
+    <section className=" py-5 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-4 lg:mb-12">
           <h2 className="lg:text-3xl text-xl font-bold tracking-tight">

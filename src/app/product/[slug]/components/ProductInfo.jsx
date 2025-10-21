@@ -1,4 +1,3 @@
-// src/app/product/[slug]/components/ProductInfo.jsx
 "use client";
 
 import { useState } from "react";
@@ -14,7 +13,7 @@ const ProductInfo = ({ product }) => {
   return (
     <div className="lg:sticky lg:top-24">
       {/* প্রোডাক্টের নাম */}
-      <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-base-content">
+      <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight text-base-content">
         {product.name}
       </h1>
 
@@ -26,11 +25,6 @@ const ProductInfo = ({ product }) => {
             ৳{product.oldPrice}
           </p>
         )}
-      </div>
-
-      {/* বর্ণনা */}
-      <div className="mt-6">
-        <p className="text-base text-base-content/80">{product.description}</p>
       </div>
 
       {/* Quantity এবং Add to Cart বাটন */}
@@ -65,6 +59,19 @@ const ProductInfo = ({ product }) => {
           <HiOutlineShoppingCart className="h-6 w-6" /> Add to Cart
         </button>
       </div>
+
+      {/* পরিবর্তন: ডেসক্রিপশনটিকে এখানে নিয়ে আসা হয়েছে */}
+      {/* product.description থাকলে তবেই এই অংশটি দেখানো হবে */}
+      {product.description && (
+        <div className="mt-10">
+          <h3 className="text-lg font-bold text-base-content/90 mb-2">
+            Description
+          </h3>
+          <p className="text-base text-base-content/80">
+            {product.description}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

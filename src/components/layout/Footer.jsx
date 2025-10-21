@@ -1,5 +1,3 @@
-// src/components/layout/Footer.jsx
-
 "use client";
 
 import Image from "next/image";
@@ -10,40 +8,37 @@ import { IoCall, IoLocationSharp, IoMail } from "react-icons/io5";
 const Footer = () => {
   return (
     <footer className="bg-base-200 text-base-content">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* --- উপরের অংশ: লোগো, ম্যাপ এবং সোশ্যাল আইকন --- */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center border-b border-base-300 pb-8 mb-8">
-          {/* লোগো এবং ট্যাগলাইন */}
+      {/* পরিবর্তন: মোবাইলের জন্য padding আরও কমানো হয়েছে (py-6) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center border-b border-base-300 pb-6 mb-6">
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <Link href="/">
               <Image
                 src="/images/logo.png"
                 alt="PetNest Logo"
-                width={150}
-                height={50}
+                width={120}
+                height={40}
               />
             </Link>
-            <p className="mt-2 text-sm text-base-content/70">
+            <p className="mt-2 text-xs text-base-content/70">
               Your Pet's Happiness Starts Here
             </p>
           </div>
-
-          {/* ম্যাপ সেকশন */}
           <div className="w-full text-center">
-            <h3 className="font-bold mb-4">Find Our Store</h3>
+            <h3 className="font-semibold text-base mb-3">Find Our Store</h3>
             <Link
               href="https://www.google.com/maps/place/Jigatola,+Dhaka"
               target="_blank"
               rel="noopener noreferrer"
               className="group"
             >
-              <div className="relative rounded-lg overflow-hidden h-32 w-full shadow-lg">
+              <div className="relative rounded-lg overflow-hidden h-28 w-full shadow-md">
                 <Image
                   src="/images/map.png"
                   alt="Our store location on map"
                   fill
-                  sizes="33vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover"
                 />
               </div>
             </Link>
@@ -52,21 +47,19 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <button className="btn btn-primary btn-sm mt-4">
+              <button className="btn btn-primary btn-xs mt-3">
                 Get Directions
               </button>
             </Link>
           </div>
-
-          {/* সোশ্যাল মিডিয়া আইকন */}
-          <div className="flex justify-center md:justify-end gap-4">
+          <div className="flex justify-center md:justify-end gap-2">
             <a
               href="#"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-ghost btn-circle"
             >
-              <FaFacebookF size={20} />
+              <FaFacebookF size={18} />
             </a>
             <a
               href="#"
@@ -74,7 +67,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               className="btn btn-ghost btn-circle"
             >
-              <FaInstagram size={20} />
+              <FaInstagram size={18} />
             </a>
             <a
               href="#"
@@ -82,7 +75,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               className="btn btn-ghost btn-circle"
             >
-              <FaYoutube size={20} />
+              <FaYoutube size={18} />
             </a>
             <a
               href="#"
@@ -90,16 +83,18 @@ const Footer = () => {
               rel="noopener noreferrer"
               className="btn btn-ghost btn-circle"
             >
-              <FaTiktok size={20} />
+              <FaTiktok size={18} />
             </a>
           </div>
         </div>
 
         {/* --- মাঝের অংশ: লিঙ্কসমূহ --- */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center md:text-left">
+        {/* পরিবর্তন: মোবাইলে ২ কলাম এবং লেখা বাম-ঘেঁষা (left-aligned) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 text-left">
           <div>
-            <h6 className="footer-title">About Us</h6>
-            <div className="flex flex-col gap-2 mt-4">
+            {/* পরিবর্তন: ফন্ট সাইজ ছোট করা হয়েছে (text-sm) */}
+            <h6 className="footer-title text-sm">About Us</h6>
+            <div className="flex flex-col gap-2 mt-3 text-sm">
               <Link href="/about" className="link link-hover">
                 About PetNest
               </Link>
@@ -112,8 +107,8 @@ const Footer = () => {
             </div>
           </div>
           <div>
-            <h6 className="footer-title">Customer Service</h6>
-            <div className="flex flex-col gap-2 mt-4">
+            <h6 className="footer-title text-sm">Customer Service</h6>
+            <div className="flex flex-col gap-2 mt-3 text-sm">
               <Link href="/contact" className="link link-hover">
                 Contact Us
               </Link>
@@ -126,13 +121,13 @@ const Footer = () => {
             </div>
           </div>
           <div>
-            <h6 className="footer-title">Policies</h6>
-            <div className="flex flex-col gap-2 mt-4">
+            <h6 className="footer-title text-sm">Policies</h6>
+            <div className="flex flex-col gap-2 mt-3 text-sm">
               <Link href="/privacy-policy" className="link link-hover">
                 Privacy Policy
               </Link>
               <Link href="/refund-policy" className="link link-hover">
-                Return Refund Policy
+                Return & Refund
               </Link>
               <Link href="/terms" className="link link-hover">
                 Terms & Conditions
@@ -140,36 +135,35 @@ const Footer = () => {
             </div>
           </div>
           <div>
-            <h6 className="footer-title">Contact Info</h6>
-            <div className="flex flex-col gap-3 mt-4">
-              <div className="flex items-center gap-2 justify-center md:justify-start">
-                <IoLocationSharp />
-                <p>Jigatola, Dhanmondi, Dhaka</p>
+            <h6 className="footer-title text-sm">Contact Info</h6>
+            <div className="flex flex-col gap-3 mt-3 text-sm">
+              <div className="flex items-center gap-2">
+                <IoLocationSharp className="shrink-0" />{" "}
+                <p>Jigatola, Dhanmondi</p>
               </div>
-              <div className="flex items-center gap-2 justify-center md:justify-start">
-                <IoCall />
-                <p>+880 123 456 7890</p>
+              <div className="flex items-center gap-2">
+                <IoCall className="shrink-0" /> <p>+8801234567890</p>
               </div>
-              <div className="flex items-center gap-2 justify-center md:justify-start">
-                <IoMail />
-                <p>info@petnest.com</p>
+              <div className="flex items-center gap-2">
+                <IoMail className="shrink-0" /> <p>info@petnest.com</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* --- নিচের অংশ: কপিরাইট এবং পেমেন্ট আইকন --- */}
-        <div className="border-t border-base-300 mt-8 pt-8 flex flex-col-reverse md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-center md:text-left">
+        <div className="border-t border-base-300 mt-8 pt-6 flex flex-col-reverse md:flex-row justify-between items-center gap-4">
+          {/* পরিবর্তন: ফন্ট সাইজ আরও ছোট করা হয়েছে (text-xs) */}
+          <p className="text-xs text-base-content/70 text-center md:text-left">
             © {new Date().getFullYear()} PetNest. All rights reserved.
           </p>
-          <div className="h-full ">
+          <div className="w-full max-w-[250px] md:max-w-[280px]">
             <Image
               src="/images/payment-method.png"
               alt="Payment Methods"
-              width={400}
-              height={32}
-              className="h-full w-auto object-contain rounded-xl"
+              width={280}
+              height={22}
+              className="mx-auto md:mx-0"
             />
           </div>
         </div>

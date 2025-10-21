@@ -9,9 +9,9 @@ const TrendingProducts = () => {
   const trendingProducts = allProducts.filter((p) => p.isTrending).slice(0, 10);
 
   return (
-    <section className="py-12 md:py-16 bg-base-100">
+    <section className=" bg-base-100 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+        <div className="text-center mb-6 lg:mb-12">
           <h2 className="text-3xl font-bold tracking-tight">Trending Now</h2>
           <Link href="/shop" className="btn btn-link btn-primary mt-2">
             Shop More <span aria-hidden="true">→</span>

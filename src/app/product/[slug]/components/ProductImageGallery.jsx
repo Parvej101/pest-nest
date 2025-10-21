@@ -1,4 +1,3 @@
-// src/app/product/[slug]/components/ProductImageGallery.jsx
 "use client";
 
 import Image from "next/image";
@@ -12,7 +11,6 @@ const ProductImageGallery = ({
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
-    // এই কোডটি নিরাপদে প্রথম ছবিটি সেট করে
     if (thumbnailSrc) {
       setSelectedImage({
         id: "thumbnail",
@@ -34,10 +32,12 @@ const ProductImageGallery = ({
       alt: `${productName} main image`,
     });
   }
-  allImages.push(...galleryImages);
+  // galleryImages একটি অ্যারে না হলে যেন error না আসে, তার জন্য একটি চেক যোগ করা হলো
+  if (Array.isArray(galleryImages)) {
+    allImages.push(...galleryImages);
+  }
 
   if (!selectedImage) {
-    // যদি কোনো ছবিই না থাকে, তাহলে একটি ফলব্যাক মেসেজ দেখানো হবে
     return (
       <div className="w-full max-w-2xl mx-auto aspect-square relative rounded-2xl flex items-center justify-center bg-base-200">
         <p className="text-base-content/70">No image available.</p>
@@ -59,14 +59,14 @@ const ProductImageGallery = ({
         />
       </div>
 
-      {/* Thumbnail Previews (যদি একাধিক ছবি থাকে) */}
+      {/* পরিবর্তন: এই কন্ডিশনটি নিশ্চিত করে যে, ১টির বেশি ছবি থাকলেই কেবল নিচের প্রিভিউ দেখানো হবে */}
       {allImages.length > 1 && (
-        <div className="flex justify-center flex-wrap gap-4 mt-6">
+        <div className="flex justify-center flex-wrap gap-3 sm:gap-4 mt-6">
           {allImages.map((image) => (
             <button
               key={image.id}
               onClick={() => setSelectedImage(image)}
-              className={`w-20 h-20 relative rounded-lg overflow-hidden border-2 transition-all duration-200
+              className={`w-14 h-14 sm:w-20 sm:h-20 relative rounded-lg overflow-hidden border-2 transition-all duration-200
                 ${
                   selectedImage.id === image.id
                     ? "border-primary shadow-md"
