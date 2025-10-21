@@ -14,7 +14,7 @@ const ProductCard = ({ product }) => {
     <div className="group">
       {/* ছবির অংশ */}
       <Link href={`/product/${product.slug}`}>
-        <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden bg-base-200 shadow-sm group-hover:shadow-xl transition-shadow duration-300">
+        <div className="relative w-full aspect-3/4 rounded-lg overflow-hidden bg-base-200 shadow-sm group-hover:shadow-xl transition-shadow duration-300">
           <Image
             src={product.imageSrc}
             alt={product.name}
