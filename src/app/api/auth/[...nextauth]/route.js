@@ -1,28 +1,31 @@
+// src/app/api/auth/[...nextauth]/route.js
+
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import clientPromise from "../../../../../lib/mongodb"; // পাথটি ঠিক আছে কিনা নিশ্চিত করুন
+import clientPromise from "../../../../../lib/mongodb";
 
 export const authOptions = {
-  // MongoDB Adapter কনফিগার করা হচ্ছে
-  // এটি ইউজার এবং সেশনের ডেটা আপনার MongoDB-তে সেভ করবে
   adapter: MongoDBAdapter(clientPromise),
-  
-  // লগইন প্রোভাইডার কনফিগার করা হচ্ছে
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
-    // আপনি এখানে আরও প্রোভাইডার (যেমন GitHub, Facebook) যোগ করতে পারেন
   ],
   
-  // এখানে আপনি সেশন স্ট্র্যাটেজি, কলব্যাক ইত্যাদি কাস্টমাইজ করতে পারেন
-  // আপাতত ডিফল্টই যথেষ্ট
+  // পরিবর্তন: এই callbacks অংশটি নতুন যোগ করা হয়েছে
+  callbacks: {
+    async session({ session, user }) {
+      // সেশন অবজেক্টের ভেতরে ইউজারের role যোগ করা হচ্ছে
+      const adminEmails = process.env.ADMIN_EMAIL.split(',');
+      if (adminEmails.includes(user.email)) {
+        session.user.role = 'admin';
+      }
+      return session;
+    },
+  },
 };
 
-// NextAuth হ্যান্ডলার তৈরি করা হচ্ছে
 const handler = NextAuth(authOptions);
-
-// GET এবং POST রিকোয়েস্টের জন্য হ্যান্ডলারটি এক্সপোর্ট করা হচ্ছে
 export { handler as GET, handler as POST };
