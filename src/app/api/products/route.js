@@ -20,4 +20,22 @@ export async function GET(request) {
   }
 }
 
-// আমরা পরে এখানে POST, PUT, DELETE ফাংশনগুলোও যোগ করতে পারব
+export async function POST(request) {
+  await dbConnect();
+
+  try {
+    // রিকোয়েস্টের বডি থেকে JSON ডেটা গ্রহণ করা
+    const body = await request.json();
+    
+    // Product মডেল ব্যবহার করে ডেটাবেসে নতুন প্রোডাক্ট তৈরি করা
+    // Product.create() Mongoose-এর একটি ফাংশন যা স্কিমা অনুযায়ী ডেটা ভ্যালিডেট করে
+    const product = await Product.create(body);
+
+    // সফলভাবে তৈরি হওয়ার পর একটি success মেসেজসহ নতুন প্রোডাক্টটি রিটার্ন করা
+    return NextResponse.json({ success: true, data: product }, { status: 201 }); // 201 মানে "Created"
+  
+  } catch (error) {
+    // Mongoose-এর ভ্যালিডেশন error হলে সেটি সুন্দরভাবে দেখানো হবে
+    return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+  }
+}
