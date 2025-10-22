@@ -146,7 +146,7 @@ const AddProductForm = () => {
             type="text"
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
-            className="input input-bordered"
+            className="input input-bordered bg-base-100/50 "
             required
           />
         </div>
@@ -183,7 +183,7 @@ const AddProductForm = () => {
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="textarea textarea-bordered h-24"
+          className="textarea textarea-bordered h-32 md:h-40 w-full"
           required
         ></textarea>
       </div>
