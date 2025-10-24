@@ -1,0 +1,5 @@
+import { NextResponse } from "next/server";
+import dbConnect from "../../../../../lib/dbConnect";
+import Variation from "../../../../../models/Variation";
+export async function PUT(request, { params }) { const { id } = params; const { name } = await request.json(); await dbConnect(); try { const updatedVariation = await Variation.findByIdAndUpdate(id, { name }, { new: true, runValidators: true }); if (!updatedVariation) return NextResponse.json({ success: false, error: "Variation not found" }, { status: 404 }); return NextResponse.json({ success: true, data: updatedVariation }); } catch (error) { return NextResponse.json({ success: false, error: error.message }, { status: 400 }); } }
+export async function DELETE(request, { params }) { const { id } = params; await dbConnect(); try { const deletedVariation = await Variation.findByIdAndDelete(id); if (!deletedVariation) return NextResponse.json({ success: false, error: "Variation not found" }, { status: 404 }); return NextResponse.json({ success: true, data: {} }); } catch (error) { return NextResponse.json({ success: false, error: error.message }, { status: 400 }); } }

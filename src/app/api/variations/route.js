@@ -1,0 +1,5 @@
+import { NextResponse } from "next/server";
+import dbConnect from "../../../../lib/dbConnect";
+import Variation from "../../../../models/Variation";
+export async function GET() { await dbConnect(); try { const variations = await Variation.find({}).sort({ createdAt: -1 }); return NextResponse.json({ success: true, data: variations }); } catch (error) { return NextResponse.json({ success: false, error: error.message }, { status: 400 }); } }
+export async function POST(request) { await dbConnect(); try { const body = await request.json(); const variation = await Variation.create(body); return NextResponse.json({ success: true, data: variation }, { status: 201 }); } catch (error) { if (error.code === 11000) { return NextResponse.json({ success: false, error: "This variation already exists." }, { status: 409 }); } return NextResponse.json({ success: false, error: error.message }, { status: 400 }); } }
