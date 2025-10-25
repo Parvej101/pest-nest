@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiPlus, FiTrash2, FiUploadCloud, FiX } from "react-icons/fi";
 
+// পরিবর্তন ১: productToEdit নামে একটি নতুন prop গ্রহণ করা হচ্ছে
 const AddProductForm = ({
   categories = [],
   variations = [],
@@ -14,7 +15,7 @@ const AddProductForm = ({
   const router = useRouter();
   const isEditMode = !!productToEdit;
 
-  // We use a single state object to manage all form data
+  // পরিবর্তন ২: সব state-গুলোকে এখন একটিমাত্র formData অবজেক্টে রাখা হয়েছে
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -37,7 +38,7 @@ const AddProductForm = ({
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // useEffect to pre-fill the form in edit mode
+  // পরিবর্তন ৩: useEffect ব্যবহার করে Edit Mode-এর জন্য state সেট করা হচ্ছে
   useEffect(() => {
     if (isEditMode && productToEdit) {
       setFormData({
@@ -66,7 +67,7 @@ const AddProductForm = ({
     }
   }, [isEditMode, productToEdit]);
 
-  // Generic handler for most text inputs and selects
+  // Generic handler for most text inputs, selects, and checkboxes
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -89,7 +90,6 @@ const AddProductForm = ({
     }));
   };
 
-  // Handlers for image uploads
   const handleThumbnailUpload = (result) =>
     setFormData((prev) => ({ ...prev, thumbnail: result.info.secure_url }));
   const handleGalleryUpload = (result) =>
@@ -112,7 +112,6 @@ const AddProductForm = ({
       gallery: prev.gallery.filter((img) => img.id !== id),
     }));
 
-  // Handlers for variations
   const handleVariantChange = (index, event) => {
     const newVariants = [...formData.variants];
     newVariants[index][event.target.name] = event.target.value;
@@ -204,8 +203,8 @@ const AddProductForm = ({
 
       setSuccess(`Product ${isEditMode ? "updated" : "added"} successfully!`);
       router.refresh();
-      if (!isEditMode) {
-        // Optionally reset form state here if needed
+      if (isEditMode) {
+        router.push("/admin/products");
       }
     } catch (err) {
       setError(err.message);
@@ -220,7 +219,7 @@ const AddProductForm = ({
       className="space-y-6 bg-base-100 p-6 md:p-8 rounded-lg shadow-xl"
     >
       <h2 className="text-2xl font-bold mb-4">
-        {isEditMode ? "Edit Product" : "Add New Product"}
+        {isEditMode ? `Edit Product: ${productToEdit.name}` : "Add New Product"}
       </h2>
 
       {error && (
@@ -264,8 +263,8 @@ const AddProductForm = ({
         </div>
       </div>
 
-      {/* -- Row 2: Category + Variation Type -- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* -- Row 2: Category + Featured/Trending -- */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
         <div className="form-control">
           <label className="label">
             <span className="label-text font-semibold">Category *</span>
@@ -287,26 +286,27 @@ const AddProductForm = ({
             ))}
           </select>
         </div>
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text font-semibold">Variation Type</span>
+        <div className="flex gap-4 pt-4 md:pt-8">
+          <label className="label cursor-pointer gap-2">
+            <input
+              type="checkbox"
+              name="isFeatured"
+              checked={formData.isFeatured}
+              onChange={handleInputChange}
+              className="checkbox checkbox-primary"
+            />
+            <span className="label-text font-semibold">Featured</span>
           </label>
-          <select
-            name="variationType"
-            value={formData.variationType}
-            onChange={handleInputChange}
-            className="select select-bordered"
-            disabled={formData.type !== "variation"}
-          >
-            <option value="" disabled>
-              Select a variation type
-            </option>
-            {variations.map((v) => (
-              <option key={v._id} value={v.name}>
-                {v.name}
-              </option>
-            ))}
-          </select>
+          <label className="label cursor-pointer gap-2">
+            <input
+              type="checkbox"
+              name="isTrending"
+              checked={formData.isTrending}
+              onChange={handleInputChange}
+              className="checkbox checkbox-primary"
+            />
+            <span className="label-text font-semibold">Trending</span>
+          </label>
         </div>
       </div>
 
@@ -348,20 +348,19 @@ const AddProductForm = ({
           </label>
           {formData.thumbnail ? (
             <div className="relative w-32 h-32 rounded-md border-2 border-base-300">
-              {" "}
               <Image
                 src={formData.thumbnail}
                 alt="Thumbnail Preview"
                 fill
                 className="object-cover rounded-md"
-              />{" "}
+              />
               <button
                 type="button"
                 onClick={handleRemoveThumbnail}
                 className="btn btn-xs btn-circle btn-error absolute -top-2 -right-2"
               >
                 <FiX />
-              </button>{" "}
+              </button>
             </div>
           ) : (
             <CldUploadButton
@@ -392,28 +391,27 @@ const AddProductForm = ({
                 key={img.id}
                 className="relative w-20 h-20 rounded-md border-2 border-base-300"
               >
-                {" "}
                 <Image
                   src={img.src}
                   alt="Gallery Preview"
                   fill
                   className="object-cover rounded-md"
-                />{" "}
+                />
                 <button
                   type="button"
                   onClick={() => handleRemoveGalleryImage(img.id)}
                   className="btn btn-xs btn-circle btn-error absolute -top-2 -right-2"
                 >
                   <FiX />
-                </button>{" "}
+                </button>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* -- Row 5: Type, Featured, Trending -- */}
-      <div className="p-4 border border-dashed border-base-300 rounded-lg flex flex-wrap items-center gap-x-8 gap-y-4">
+      {/* -- Row 5: Product Type + Variation Type -- */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="form-control">
           <label className="label py-0">
             <span className="label-text font-semibold">Product Type</span>
@@ -422,7 +420,7 @@ const AddProductForm = ({
             <button
               type="button"
               onClick={() => setFormData((p) => ({ ...p, type: "single" }))}
-              className={`btn btn-sm join-item w-24 ${
+              className={`btn btn-sm join-item w-1/2 ${
                 formData.type === "single" ? "btn-primary" : ""
               }`}
             >
@@ -431,7 +429,7 @@ const AddProductForm = ({
             <button
               type="button"
               onClick={() => setFormData((p) => ({ ...p, type: "variation" }))}
-              className={`btn btn-sm join-item w-24 ${
+              className={`btn btn-sm join-item w-1/2 ${
                 formData.type === "variation" ? "btn-primary" : ""
               }`}
             >
@@ -439,42 +437,38 @@ const AddProductForm = ({
             </button>
           </div>
         </div>
-        <div className="flex gap-4 pt-4 md:pt-0">
-          <label className="label cursor-pointer gap-2">
-            <input
-              type="checkbox"
-              name="isFeatured"
-              checked={formData.isFeatured}
-              onChange={handleInputChange}
-              className="checkbox checkbox-primary"
-            />
-            <span className="label-text font-semibold">Featured</span>
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text font-semibold">Variation Type</span>
           </label>
-          <label className="label cursor-pointer gap-2">
-            <input
-              type="checkbox"
-              name="isTrending"
-              checked={formData.isTrending}
-              onChange={handleInputChange}
-              className="checkbox checkbox-primary"
-            />
-            <span className="label-text font-semibold">Trending</span>
-          </label>
+          <select
+            name="variationType"
+            value={formData.variationType}
+            onChange={handleInputChange}
+            className="select select-bordered"
+            disabled={formData.type !== "variation"}
+          >
+            <option value="" disabled>
+              Select a variation type
+            </option>
+            {variations.map((v) => (
+              <option key={v._id} value={v.name}>
+                {v.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
       {/* -- Conditional Section for Single Product -- */}
       {formData.type === "single" && (
         <div className="p-6 border border-base-300 rounded-lg space-y-4 animate-fadeIn">
-          {" "}
-          <h3 className="font-bold text-lg">Single Product Details</h3>{" "}
+          <h3 className="font-bold text-lg">Single Product Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {" "}
             <div className="form-control">
-              {" "}
               <label className="label">
                 <span className="label-text font-semibold">Price *</span>
-              </label>{" "}
+              </label>
               <input
                 type="number"
                 name="price"
@@ -482,13 +476,12 @@ const AddProductForm = ({
                 onChange={handleInputChange}
                 className="input input-bordered"
                 required={formData.type === "single"}
-              />{" "}
-            </div>{" "}
+              />
+            </div>
             <div className="form-control">
-              {" "}
               <label className="label">
                 <span className="label-text font-semibold">Stock *</span>
-              </label>{" "}
+              </label>
               <input
                 type="number"
                 name="stock"
@@ -496,26 +489,24 @@ const AddProductForm = ({
                 onChange={handleInputChange}
                 className="input input-bordered"
                 required={formData.type === "single"}
-              />{" "}
-            </div>{" "}
-          </div>{" "}
+              />
+            </div>
+          </div>
         </div>
       )}
 
       {/* -- Conditional Section for Variation Product -- */}
       {formData.type === "variation" && (
         <div className="p-6 border border-base-300 rounded-lg space-y-6 animate-fadeIn">
-          {" "}
-          <h3 className="font-bold text-lg">Product Variations</h3>{" "}
+          <h3 className="font-bold text-lg">Product Variations</h3>
           {formData.variants.map((variant, index) => (
             <div
               key={index}
               className="p-4 border border-dashed border-base-300 rounded-md relative pt-6"
             >
-              {" "}
               <p className="font-semibold mb-2 absolute -top-3 bg-base-100 px-2">
                 Variant #{index + 1}
-              </p>{" "}
+              </p>
               {formData.variants.length > 1 && (
                 <button
                   type="button"
@@ -524,16 +515,14 @@ const AddProductForm = ({
                 >
                   <FiTrash2 />
                 </button>
-              )}{" "}
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {" "}
                 <div className="form-control">
-                  {" "}
                   <label className="label">
                     <span className="label-text">
                       {formData.variationType || "Value"} *
                     </span>
-                  </label>{" "}
+                  </label>
                   <input
                     type="text"
                     name="value"
@@ -541,13 +530,12 @@ const AddProductForm = ({
                     onChange={(e) => handleVariantChange(index, e)}
                     className="input input-bordered"
                     required
-                  />{" "}
-                </div>{" "}
+                  />
+                </div>
                 <div className="form-control">
-                  {" "}
                   <label className="label">
                     <span className="label-text">Price *</span>
-                  </label>{" "}
+                  </label>
                   <input
                     type="number"
                     name="price"
@@ -555,13 +543,12 @@ const AddProductForm = ({
                     onChange={(e) => handleVariantChange(index, e)}
                     className="input input-bordered"
                     required
-                  />{" "}
-                </div>{" "}
+                  />
+                </div>
                 <div className="form-control">
-                  {" "}
                   <label className="label">
                     <span className="label-text">Stock *</span>
-                  </label>{" "}
+                  </label>
                   <input
                     type="number"
                     name="stock"
@@ -569,13 +556,12 @@ const AddProductForm = ({
                     onChange={(e) => handleVariantChange(index, e)}
                     className="input input-bordered"
                     required
-                  />{" "}
-                </div>{" "}
+                  />
+                </div>
                 <div className="form-control">
-                  {" "}
                   <label className="label">
                     <span className="label-text">Variant Image</span>
-                  </label>{" "}
+                  </label>
                   {variant.image ? (
                     <div className="relative w-20 h-20">
                       <Image
@@ -603,18 +589,18 @@ const AddProductForm = ({
                     >
                       <FiUploadCloud /> Upload
                     </CldUploadButton>
-                  )}{" "}
-                </div>{" "}
-              </div>{" "}
+                  )}
+                </div>
+              </div>
             </div>
-          ))}{" "}
+          ))}
           <button
             type="button"
             onClick={addVariant}
             className="btn btn-secondary btn-sm mt-4"
           >
             <FiPlus /> Add Another Variant
-          </button>{" "}
+          </button>
         </div>
       )}
 
