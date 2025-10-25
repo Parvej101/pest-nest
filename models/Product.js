@@ -1,85 +1,70 @@
 import mongoose from 'mongoose';
 
-// --- ভ্যারিয়েন্টের জন্য একটি ছোট সাব-স্কিমা ---
-// এটি মূল স্কিমার ভেতরে ব্যবহার করা হবে
+// --- ভ্যারিয়েন্ট সাব-স্কিমা (আপডেট করা) ---
+// এটি এখন আরও ফ্লেক্সিবল (size-এর বদলে value ব্যবহার করা হয়েছে) এবং এতে stock আছে
 const VariantSchema = new mongoose.Schema({
-  sku: {
-    type: String,
+  value: { 
+    type: String, 
+    required: [true, 'Please provide a value (e.g., Red, XL, 1KG) for this variant.'] 
   },
-  size: {
-    type: String,
-    required: [true, 'Please provide a size for this variant.'],
+  price: { 
+    type: Number, 
+    required: [true, 'Please provide a price for this variant.'] 
   },
-  price: {
-    type: Number,
-    required: [true, 'Please provide a price for this variant.'],
+  stock: { 
+    type: Number, 
+    default: 0 // ডিফল্ট স্টক ০
   },
+  image: { 
+    type: String // ভ্যারিয়েন্টের নিজস্ব ছবি (ঐচ্ছিক)
+  }
 });
 
-// --- গ্যালারি ইমেজের জন্য একটি ছোট সাব-স্কিমা ---
+// --- গ্যালারি ইমেজের সাব-স্কিমা (অপরিবর্তিত) ---
 const GalleryImageSchema = new mongoose.Schema({
-  id: {
-    type: String,
-  },
-  src: {
-    type: String,
-    required: [true, 'Please provide an image source.'],
-  },
-  alt: {
-    type: String,
-  },
+  id: { type: String },
+  src: { type: String, required: true },
+  alt: { type: String },
 });
 
 
-// --- মূল প্রোডাক্ট স্কিমা ---
+// --- মূল প্রোডাক্ট স্কিমা (আপডেট করা) ---
 const ProductSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Please provide a product name.'],
-    trim: true, // নামের আগে-পরে থাকা অপ্রয়োজনীয় স্পেস মুছে দেবে
-  },
-  slug: {
-    type: String,
-    required: [true, 'Please provide a unique slug.'],
-    unique: true, // নিশ্চিত করে যে প্রতিটি প্রোডাক্টের slug আলাদা হবে
-  },
-  imageSrc: {
-    type: String,
-    required: [true, 'Please provide a thumbnail image source.'],
-  },
-  galleryImages: [GalleryImageSchema], // এখানে আমরা ওপরের সাব-স্কিমাটি ব্যবহার করছি
+  name: { type: String, required: [true, 'Please provide a product name.'], trim: true },
+  slug: { type: String, required: [true, 'Please provide a unique slug.'], unique: true },
+  imageSrc: { type: String, required: [true, 'Please provide a thumbnail image source.'] },
+  galleryImages: [GalleryImageSchema],
+  description: { type: String, required: [true, 'Please provide a product description.'] },
+  category: { type: String, required: [true, 'Please provide a product category.'] },
   
-  // যে প্রোডাক্টের ভ্যারিয়েশন নেই, তার জন্য এই দুটি ফিল্ড
-  price: {
-    type: Number,
-  },
-  oldPrice: {
-    type: Number,
-  },
-
-  // যে প্রোডাক্টের ভ্যারিয়েশন আছে, তার জন্য এই ফিল্ড
-  variants: [VariantSchema], // এখানেও সাব-স্কিমা ব্যবহার করা হচ্ছে
-
-  description: {
+  // --- নতুন ফিল্ড ---
+  type: {
     type: String,
-    required: [true, 'Please provide a product description.'],
+    enum: ['single', 'variation'],
+    default: 'single',
   },
-  category: {
+  status: {
     type: String,
-    required: [true, 'Please provide a product category.'],
+    enum: ['active', 'inactive'],
+    default: 'active',
   },
-  isFeatured: {
-    type: Boolean,
-    default: false, // যদি কোনো মান না দেওয়া হয়, তাহলে ডিফল্টভাবে false সেট হবে
-  },
-  isTrending: {
-    type: Boolean,
-    default: false,
-  },
+  
+  // 'single' টাইপ প্রোডাক্টের জন্য
+  price: { type: Number },
+  oldPrice: { type: Number },
+  stock: { type: Number, default: 0 }, // নতুন স্টক ফিল্ড
+  
+  // 'variation' টাইপ প্রোডাক্টের জন্য
+  variationType: { type: String }, // যেমন: "Color", "Size", "KG"
+  variants: [VariantSchema], 
+  
+  // অন্যান্য
+  productCode: { type: String },
+  unitType: { type: String, default: 'Piece' },
+  isFeatured: { type: Boolean, default: false },
+  isTrending: { type: Boolean, default: false },
 }, {
-  timestamps: true // এই অপশনটি স্বয়ংক্রিয়ভাবে createdAt এবং updatedAt নামে দুটি ফিল্ড যোগ করে দেবে
+  timestamps: true 
 });
 
-// এই লাইনটি একটি অপটিমাইজেশন। এটি চেক করে যে 'Product' মডেলটি আগে থেকেই তৈরি করা আছে কিনা।
-// যদি থাকে, তাহলে সেটি ব্যবহার করে। যদি না থাকে, তাহলে নতুন করে তৈরি করে।
 export default mongoose.models.Product || mongoose.model('Product', ProductSchema);
