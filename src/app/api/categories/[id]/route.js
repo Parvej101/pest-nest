@@ -1,6 +1,6 @@
-import dbConnect from "@/lib/dbConnect";
-import Category from "@/models/Category";
 import { NextResponse } from "next/server";
+import dbConnect from "../../../../../lib/dbConnect.js";
+import Category from "../../../../../models/Category.js";
 
 export async function PUT(request, { params }) {
   const { id } = params;
