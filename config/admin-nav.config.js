@@ -6,7 +6,7 @@ export const productSubLinks = [
   { href: "/admin/products/new", label: "Add Product", icon: FiPlus },
   { href: "/admin/products/stock", label: "Product Stock List", icon: FiArchive },
   { href: "/admin/categories", label: "Category", icon: FiList },
-  { href: "/admin/brands", label: "Brand", icon: FiList },
+  // { href: "/admin/brands", label: "Brand", icon: FiList },
   { href: "/admin/variations", label: "Variation", icon: FiList },
 ];
 
