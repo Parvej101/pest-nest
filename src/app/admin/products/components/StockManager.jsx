@@ -73,7 +73,7 @@ const StockManager = ({ initialProducts, categories }) => {
           placeholder="Search by product name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="input input-bordered w-full md:flex-grow"
+          className="input input-bordered w-full md:grow"
         />
         <select
           value={selectedCategory}

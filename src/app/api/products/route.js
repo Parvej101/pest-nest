@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import dbConnect from "../../../../lib/dbConnect";
 import Product from "../../../../models/Product";
 
+// --- সব প্রোডাক্ট পাওয়ার জন্য GET ফাংশন ---
 export async function GET(request) {
   await dbConnect();
   try {
-    // পরিবর্তন ২: ডেটাবেস থেকেই নতুন থেকে পুরনো অনুযায়ী সাজিয়ে আনা হচ্ছে
     const products = await Product.find({}).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, data: products });
   } catch (error) {
@@ -13,19 +13,30 @@ export async function GET(request) {
   }
 }
 
-// --- নতুন প্রোডাক্ট যোগ করার জন্য POST ফাংশন ---
+// --- নতুন প্রোডাক্ট যোগ করার জন্য POST ফাংশন (আপডেট করা) ---
 export async function POST(request) {
   await dbConnect();
   try {
     const body = await request.json();
+    
+    // পরিবর্তন: productCode খালি থাকলে স্বয়ংক্রিয়ভাবে একটি তৈরি করা হচ্ছে
+    if (!body.productCode) {
+      // প্রোডাক্টের নামের প্রথম ৩ অক্ষর + একটি র‍্যান্ডম ৪-সংখ্যার নম্বর
+      const namePart = body.name.substring(0, 3).toUpperCase();
+      const randomPart = Math.floor(1000 + Math.random() * 9000);
+      body.productCode = `${namePart}-${randomPart}`;
+    }
+
     const product = await Product.create(body);
     return NextResponse.json({ success: true, data: product }, { status: 201 });
+  
   } catch (error) {
-    console.error("API POST Error:", error); // সার্ভার-সাইড লগিং-এর জন্য
+    console.error("API POST Error:", error);
     
-    // পরিবর্তন ৩: ডুপ্লিকেট slug-এর জন্য একটি সুনির্দিষ্ট error মেসেজ
-    if (error.code === 11000 && error.keyPattern?.slug) {
-      return NextResponse.json({ success: false, error: "A product with this slug already exists. Please use a unique slug." }, { status: 409 }); // 409 Conflict
+    // ডুপ্লিকেট কী (key) এর জন্য আরও উন্নত error handling
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0]; // কোন ফিল্ডটি ডুপ্লিকেট হয়েছে তা বের করা
+      return NextResponse.json({ success: false, error: `A product with this ${field} already exists. Please use a unique ${field}.` }, { status: 409 });
     }
     
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });

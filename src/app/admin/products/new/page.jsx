@@ -64,7 +64,7 @@ const NewProductPage = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8">Create a New Product</h1>
+      {/* <h1 className="text-3xl font-bold mb-8">Create a New Product</h1> */}
 
       {/* ক্যাটাগরি এবং ভ্যারিয়েশন লিস্ট props হিসেবে AddProductForm-কে পাঠানো হচ্ছে */}
       <AddProductForm categories={categories} variations={variations} />
