@@ -2,11 +2,24 @@ import { NextResponse } from "next/server";
 import dbConnect from "../../../../lib/dbConnect";
 import Product from "../../../../models/Product";
 
-// --- সব প্রোডাক্ট পাওয়ার জন্য GET ফাংশন ---
+// --- সব প্রোডাক্ট পাওয়ার জন্য GET ফাংশন (আপডেট করা) ---
 export async function GET(request) {
+  // URL থেকে query parameters পাওয়া হচ্ছে
+  const { searchParams } = new URL(request.url);
+  const status = searchParams.get('status');
+
   await dbConnect();
   try {
-    const products = await Product.find({}).sort({ createdAt: -1 });
+    const filter = {};
+    
+    // যদি অ্যাডমিন '?status=all' না পাঠায়, তাহলে ডিফল্টভাবে শুধু 'active' প্রোডাক্ট ফিল্টার হবে
+    if (status !== 'all') {
+      filter.status = 'active';
+    }
+
+    // পরিবর্তন: {filter}-এর বদলে এখন সরাসরি filter অবজেক্টটি পাস করা হচ্ছে
+    const products = await Product.find(filter).sort({ createdAt: -1 });
+    
     return NextResponse.json({ success: true, data: products });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });

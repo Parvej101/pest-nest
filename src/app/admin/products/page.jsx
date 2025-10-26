@@ -5,9 +5,12 @@ import ProductTable from "./components/ProductTable"; // আমাদের ন�
 // সার্ভারেই সব প্রোডাক্ট fetch করা হচ্ছে
 async function getAllProducts() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/products?status=all`,
+      {
+        cache: "no-store",
+      }
+    );
     if (!res.ok) throw new Error("Failed to fetch products");
     const data = await res.json();
     return data.success ? data.data : [];

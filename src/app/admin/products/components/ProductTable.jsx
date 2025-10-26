@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import ProductActions from "./ProductActions"; // ProductActions ইম্পোর্ট করা হয়েছে
+import ProductStatusToggle from "./ProductStatusToggle";
 
 const ProductTable = ({ products, categories }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -87,15 +88,10 @@ const ProductTable = ({ products, categories }) => {
                     <span className="capitalize">{product.type}</span>
                   </td>
                   <td>
-                    <span
-                      className={`badge badge-sm ${
-                        product.status === "active"
-                          ? "badge-success"
-                          : "badge-error"
-                      }`}
-                    >
-                      {product.status}
-                    </span>
+                    <ProductStatusToggle
+                      productId={product._id}
+                      initialStatus={product.status}
+                    />
                   </td>
                   <td>৳{product.price}</td>
                   <td className="text-center">

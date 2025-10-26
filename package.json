@@ -21,6 +21,7 @@
     "react-dom": "^18.2.0",
     "react-fast-marquee": "^1.6.5",
     "react-icons": "^5.5.0",
+    "react-quill": "^2.0.0",
     "sweetalert2": "^11.26.3",
     "swiper": "^12.0.2"
   },

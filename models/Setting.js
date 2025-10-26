@@ -1,0 +1,38 @@
+import mongoose from 'mongoose';
+
+const SettingSchema = new mongoose.Schema({
+  // আমরা একটি মাত্র ডকুমেন্ট রাখব, তাই একটি ইউনিক 'key' ব্যবহার করছি
+  key: {
+    type: String,
+    default: 'site-settings',
+    unique: true,
+  },
+  // Contact Information
+  contactPhone: { type: String, trim: true },
+  contactEmail: { type: String, trim: true },
+  contactAddress: { type: String, trim: true },
+   contactWhatsapp: { type: String, trim: true },
+
+  // Announcement
+  announcementText: { type: String, trim: true },
+
+  // Map
+  mapLink: { type: String, trim: true },
+  mapImageSrc: { type: String },
+
+   footerTagline: { type: String, trim: true },
+  socialFacebook: { type: String, trim: true },
+  socialInstagram: { type: String, trim: true },
+  socialYoutube: { type: String, trim: true },
+  socialTiktok: { type: String, trim: true },
+  paymentMethodsImageSrc: { type: String },
+
+   // পরিবর্তন: Policy লিঙ্কগুলোর জন্য নতুন ফিল্ড
+  policyPrivacyLink: { type: String, trim: true },
+  policyRefundLink: { type: String, trim: true },
+  policyTermsLink: { type: String, trim: true },
+
+
+}, { timestamps: true });
+
+export default mongoose.models.Setting || mongoose.model('Setting', SettingSchema);
