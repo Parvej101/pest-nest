@@ -1,6 +1,6 @@
-import dbConnect from "@/lib/dbConnect";
-import Page from "@/models/Page";
 import { NextResponse } from "next/server";
+import dbConnect from "../../../../../lib/dbConnect.js";
+import Page from "../../../../../models/Page.js";
 
 // slug দিয়ে একটি পেজের কন্টেন্ট পাওয়ার জন্য GET ফাংশন
 export async function GET(request, { params }) {

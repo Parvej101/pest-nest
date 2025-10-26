@@ -98,7 +98,7 @@ const PagesManager = () => {
       </div>
 
       {/* Rich Text Editor */}
-      <div className="bg-white text-black rounded-md min-h-[300px]">
+      <div className="bg-white text-black rounded-md min-h-[500px]">
         {isLoading ? (
           <div className="p-4 text-center">
             <span className="loading loading-spinner"></span>
@@ -108,7 +108,7 @@ const PagesManager = () => {
             theme="snow"
             value={content}
             onChange={setContent}
-            style={{ height: "300px" }}
+            style={{ height: "400px" }}
           />
         )}
       </div>

@@ -27,11 +27,6 @@ const SettingSchema = new mongoose.Schema({
   socialTiktok: { type: String, trim: true },
   paymentMethodsImageSrc: { type: String },
 
-   // পরিবর্তন: Policy লিঙ্কগুলোর জন্য নতুন ফিল্ড
-  policyPrivacyLink: { type: String, trim: true },
-  policyRefundLink: { type: String, trim: true },
-  policyTermsLink: { type: String, trim: true },
-
 
 }, { timestamps: true });
 

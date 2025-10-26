@@ -5,8 +5,7 @@ import { usePathname } from "next/navigation";
 import { FiHeart } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 
-// পরিবর্তন: সব import এখন `@/` ব্যবহার করে src ফোল্ডার থেকে আসছে
-
+// আপনার লেআউটের জন্য প্রয়োজনীয় সব কম্পোনেন্ট ইম্পোর্ট করা হচ্ছে
 import AdminSidebar from "@/app/admin/components/AdminSidebar";
 import Announcement from "@/components/layout/Annoucement";
 import ContactFAB from "@/components/layout/ContactFAB";
@@ -22,14 +21,13 @@ export default function ClientLayout({ children }) {
   if (isAdminRoute) {
     return (
       <div className="flex min-h-screen bg-base-300">
-        <AdminSidebar></AdminSidebar>
+        <AdminSidebar />
         <main className="grow p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     );
   }
 
   // --- সাধারণ সাইটের লেআউট ---
-  // এই অংশটি আপনার পুরনো RootLayout থেকে আনা হয়েছে
   return (
     <div className="drawer">
       <input id="mobile-drawer" type="checkbox" className="drawer-toggle" />
@@ -38,7 +36,6 @@ export default function ClientLayout({ children }) {
         <Announcement />
         <Navbar />
         <main className="grow">
-          {/* Main content-এর ভেতরের কন্টেইনার ক্লাসগুলো এখানে রাখা হয়েছে */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {children}
           </div>

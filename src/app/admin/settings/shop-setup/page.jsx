@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 
 // আমরা পরের ধাপে এই কম্পোনেন্টটি তৈরি করব
 import Link from "next/link";
-import PolicySettingsForm from "../../products/components/PolicySettingsForm";
 import AnnouncementSettingsForm from "../components/AnnouncementSettingsForm";
 import ContactSettingsForm from "../components/ContactSettingsForm";
 import FooterSettingsForm from "../components/FooterSettingsForm";
@@ -99,8 +98,6 @@ const ShopSetupPage = () => {
       <AnnouncementSettingsForm settings={settings} setSettings={setSettings} />
 
       <MapSettingsForm settings={settings} setSettings={setSettings} />
-
-      <PolicySettingsForm settings={settings} setSettings={setSettings} />
 
       <FooterSettingsForm settings={settings} setSettings={setSettings} />
     </div>

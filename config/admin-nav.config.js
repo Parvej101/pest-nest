@@ -1,4 +1,4 @@
-import { FiArchive, FiAward, FiImage, FiInfo, FiList, FiPlus, FiShoppingBag } from "react-icons/fi";
+import { FiArchive, FiAward, FiFileText, FiImage, FiInfo, FiList, FiPlus, FiShoppingBag } from "react-icons/fi";
 
 // Product সেকশনের সাব-লিঙ্ক
 export const productSubLinks = [
@@ -16,4 +16,5 @@ export const settingsSubLinks = [
   { href: "/admin/settings/about-us", label: "About Us", icon: FiInfo },
   { href: "/admin/settings/reward-point", label: "Reward Point", icon: FiAward },
   { href: "/admin/settings/slider", label: "Slider", icon: FiImage },
+  { href: "/admin/pages", label: "Pages", icon: FiFileText },
 ];
