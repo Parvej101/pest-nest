@@ -48,7 +48,7 @@ function Navbar() {
   return (
     <>
       <header className="bg-base-200 border-b border-base-300 sticky top-0 z-30 text-base-content">
-        <div className="navbar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="navbar px-4 sm:px-6 lg:max-w-7xl lg:px-8 lg:mx-auto">
           <div className="navbar-start">
             <label
               htmlFor="mobile-drawer"
@@ -158,7 +158,7 @@ function Navbar() {
                 </div>
                 <ul
                   tabIndex={0}
-                  className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+                  className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52"
                 >
                   {isLoggedIn ? (
                     <>

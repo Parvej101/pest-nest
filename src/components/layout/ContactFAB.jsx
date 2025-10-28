@@ -55,7 +55,7 @@ const ContactFAB = () => {
         href={settings.socialFacebook || "#"}
         target="_blank"
         rel="noopener noreferrer"
-        className="btn btn-circle btn-primary text-white shadow-lg"
+        className="btn btn-circle bg-blue-600 text-white shadow-lg"
       >
         <FaFacebookF size={24} />
       </Link>
