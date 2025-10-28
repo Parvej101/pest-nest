@@ -27,9 +27,9 @@ const SubMenuPanel = ({ title, subLinks, onClose }) => {
       initial="hidden"
       animate="visible"
       exit="hidden"
-      className="w-56 bg-base-300 h-full border-l-2 border-base-100"
+      className="absolute top-0 left-0 w-full h-full bg-base-300"
     >
-      <div className="flex justify-between items-center p-4 border-b border-base-100">
+      <div className="flex justify-between items-center p-4 border-b border-base-1000">
         <h3 className="font-bold text-md">{title}</h3>
         <button onClick={onClose} className="btn btn-ghost btn-circle btn-xs">
           <IoClose size={18} />

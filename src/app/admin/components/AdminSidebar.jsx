@@ -10,7 +10,6 @@ import {
   productSubLinks,
   settingsSubLinks,
 } from "../../../../config/admin-nav.config";
-
 import SubMenuPanel from "./SubMenuPanel";
 
 const mainLinks = [
@@ -36,8 +35,13 @@ const AdminSidebar = () => {
   );
 
   return (
-    <div className="flex shrink-0">
-      <aside className="w-64 bg-base-200 text-base-content h-screen sticky top-0">
+    // পরিবর্তন: এটি এখন একটি relative কন্টেইনার এবং overflow-hidden
+    <div className="relative w-64 h-full overflow-hidden">
+      {/* --- মূল সাইডবার --- */}
+      <aside
+        className={`w-64 bg-base-200 text-base-content h-full transition-transform duration-300 ease-in-out
+          ${activeSubMenu ? "-translate-x-full" : "translate-x-0"}`}
+      >
         <div className="p-4 flex items-center gap-2">
           <Link href="/admin" className="text-2xl font-bold">
             PetNest
@@ -52,7 +56,6 @@ const AdminSidebar = () => {
                 <button
                   onClick={() => handleMenuClick(link.label)}
                   className={`${
-                    activeSubMenu === link.label ||
                     (link.label === "Product" && isProductRouteActive) ||
                     (link.label === "Settings" && isSettingsRouteActive)
                       ? "active"
@@ -76,18 +79,16 @@ const AdminSidebar = () => {
         </ul>
       </aside>
 
+      {/* --- সাব-মেনু প্যানেল (এখন এটি absolute) --- */}
       <AnimatePresence>
-        {activeSubMenu === "Product" && (
+        {activeSubMenu && (
           <SubMenuPanel
-            title="Product Management"
-            subLinks={productSubLinks}
-            onClose={() => setActiveSubMenu(null)}
-          />
-        )}
-        {activeSubMenu === "Settings" && (
-          <SubMenuPanel
-            title="Settings"
-            subLinks={settingsSubLinks}
+            title={
+              activeSubMenu === "Product" ? "Product Management" : "Settings"
+            }
+            subLinks={
+              activeSubMenu === "Product" ? productSubLinks : settingsSubLinks
+            }
             onClose={() => setActiveSubMenu(null)}
           />
         )}

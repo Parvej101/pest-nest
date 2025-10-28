@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import ProductActions from "./ProductActions"; // ProductActions ইম্পোর্ট করা হয়েছে
+import ProductActions from "./ProductActions";
 import ProductStatusToggle from "./ProductStatusToggle";
 
 const ProductTable = ({ products, categories }) => {

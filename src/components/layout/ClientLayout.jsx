@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiHeart } from "react-icons/fi";
-import { IoClose } from "react-icons/io5";
+import { IoClose, IoMenu } from "react-icons/io5"; // IoMenu আইকনটি ইম্পোর্ট করা হচ্ছে
 
 // আপনার লেআউটের জন্য প্রয়োজনীয় সব কম্পোনেন্ট ইম্পোর্ট করা হচ্ছে
 import AdminSidebar from "@/app/admin/components/AdminSidebar";
@@ -17,21 +17,52 @@ export default function ClientLayout({ children }) {
   const pathname = usePathname();
   const isAdminRoute = pathname.startsWith("/admin");
 
-  // --- অ্যাডমিন লেআউট ---
+  // --- অ্যাডমিন লেআউট (এখন এটি রেসপন্সিভ) ---
   if (isAdminRoute) {
     return (
-      <div className="flex min-h-screen bg-base-300">
-        <AdminSidebar />
-        <main className="grow p-4 sm:p-6 lg:p-8">{children}</main>
+      // md:drawer-open ক্লাসটি ডেস্কটপে সাইডবারকে সবসময় খোলা রাখে
+      <div className="drawer md:drawer-open">
+        <input id="admin-drawer" type="checkbox" className="drawer-toggle" />
+
+        {/* --- প্রধান কন্টেন্ট এলাকা --- */}
+        <main className="drawer-content flex flex-col bg-base-300">
+          {/* মোবাইলের জন্য হেডার এবং হামবার্গার মেনু বাটন */}
+          <div className="flex items-center p-2 md:hidden sticky top-0 bg-base-300 z-10 shadow-sm">
+            <label
+              htmlFor="admin-drawer"
+              className="btn btn-ghost btn-circle drawer-button"
+            >
+              <IoMenu size={24} />
+            </label>
+            <div className="grow text-center">
+              <Link href="/admin" className="text-xl font-bold">
+                PetNest Admin
+              </Link>
+            </div>
+          </div>
+
+          {/* মূল পেজের কন্টেন্ট */}
+          <div className="p-4 sm:p-6 lg:p-8 grow">{children}</div>
+        </main>
+
+        {/* --- সাইডবার এলাকা --- */}
+        <div className="drawer-side z-50">
+          <label
+            htmlFor="admin-drawer"
+            aria-label="close sidebar"
+            className="drawer-overlay"
+          ></label>
+          {/* AdminSidebar এখন এখানে থাকবে */}
+          <AdminSidebar />
+        </div>
       </div>
     );
   }
 
-  // --- সাধারণ সাইটের লেআউট ---
+  // --- সাধারণ সাইটের লেআউট (অপরিবর্তিত) ---
   return (
     <div className="drawer">
       <input id="mobile-drawer" type="checkbox" className="drawer-toggle" />
-
       <div className="drawer-content flex flex-col min-h-screen">
         <Announcement />
         <Navbar />
@@ -43,7 +74,6 @@ export default function ClientLayout({ children }) {
         <ContactFAB />
         <Footer />
       </div>
-
       <div className="drawer-side z-50">
         <label
           htmlFor="mobile-drawer"
@@ -64,32 +94,13 @@ export default function ClientLayout({ children }) {
             <li>
               <details>
                 <summary>Categories</summary>
-                <ul className="p-2 text-base">
-                  <li>
-                    <Link href="/collections/pet-toys">Pet Toys</Link>
-                  </li>
-                  <li>
-                    <Link href="/collections/pet-accessories">
-                      Pet Accessories
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/collections/cat-food">Cat Food</Link>
-                  </li>
-                </ul>
+                <ul className="p-2 text-base">...</ul>
               </details>
             </li>
             <li>
               <details>
                 <summary>Pets</summary>
-                <ul className="p-2 text-base">
-                  <li>
-                    <Link href="/collections/dogs">Dogs</Link>
-                  </li>
-                  <li>
-                    <Link href="/collections/cats">Cats</Link>
-                  </li>
-                </ul>
+                <ul className="p-2 text-base">...</ul>
               </details>
             </li>
             <div className="divider my-4"></div>

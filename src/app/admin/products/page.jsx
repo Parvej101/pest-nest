@@ -46,8 +46,11 @@ const ProductsPage = async () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Manage Products</h1>
-        <Link href="/admin/products/new" className="btn btn-primary">
+        <h1 className="lg:text-3xl text-lg font-bold">Manage Products</h1>
+        <Link
+          href="/admin/products/new"
+          className="btn btn-primary btn-sm lg:btn-md"
+        >
           <FiPlusCircle /> Add New Product
         </Link>
       </div>
