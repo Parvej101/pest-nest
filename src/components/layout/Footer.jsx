@@ -173,8 +173,11 @@ const Footer = () => {
                 <p>{settings.contactPhone || "+8801234567890"}</p>
               </div>
               <div className="flex items-center gap-2">
-                <IoMail className="shrink-0" />{" "}
-                <p>{settings.contactEmail || "info@petnest.com"}</p>
+                <IoMail className="shrink-0 " />{" "}
+                <p className="break-all">
+                  {" "}
+                  {settings.contactEmail || "info@petnest.com"}
+                </p>
               </div>
             </div>
           </div>
