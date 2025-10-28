@@ -1,15 +1,32 @@
 "use client";
 
+import { useCart } from "@/context/CartContext";
 import { useState } from "react";
 import {
   HiOutlineMinus,
   HiOutlinePlus,
   HiOutlineShoppingCart,
 } from "react-icons/hi";
+import Swal from "sweetalert2";
 
 const ProductInfo = ({ product }) => {
+  const { addToCart, updateQuantity } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const handleAddToCart = () => {
+    // এখানে আমরা একটি একটি করে quantity সংখ্যক প্রোডাক্ট যোগ করব
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product._id, product);
+    }
 
+    // সুন্দর নোটিফিকেশন
+    Swal.fire({
+      icon: "success",
+      title: "Added to Cart!",
+      text: `${quantity} x ${product.name} has been added to your cart.`,
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  };
   return (
     <div className="lg:sticky lg:top-24">
       {/* প্রোডাক্টের নাম */}
@@ -34,10 +51,7 @@ const ProductInfo = ({ product }) => {
             Quantity:
           </label>
           <div className="join">
-            <button
-              className="btn join-item"
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            >
+            <button className="btn join-item" onClick={handleAddToCart}>
               <HiOutlineMinus />
             </button>
             <input
@@ -60,8 +74,6 @@ const ProductInfo = ({ product }) => {
         </button>
       </div>
 
-      {/* পরিবর্তন: ডেসক্রিপশনটিকে এখানে নিয়ে আসা হয়েছে */}
-      {/* product.description থাকলে তবেই এই অংশটি দেখানো হবে */}
       {product.description && (
         <div className="mt-10">
           <h3 className="text-lg font-bold text-base-content/90 mb-2">

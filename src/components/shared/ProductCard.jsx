@@ -1,14 +1,36 @@
 "use client";
 
+import { useCart } from "@/context/CartContext";
 import Image from "next/image";
 import Link from "next/link";
 import { HiOutlineShoppingCart } from "react-icons/hi";
+import Swal from "sweetalert2";
 
 const ProductCard = ({ product }) => {
-  // পরিবর্তন ১: এখন আমরা images অ্যারের বদলে imageSrc আছে কিনা তা পরীক্ষা করছি
+  const { addToCart } = useCart();
+
   if (!product || !product.imageSrc) {
     return null;
   }
+  const handleAddToCart = () => {
+    addToCart(product._id, product);
+
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      },
+    });
+    Toast.fire({
+      icon: "success",
+      title: `${product.name} added to cart`,
+    });
+  };
 
   return (
     <div className="group">
@@ -25,7 +47,7 @@ const ProductCard = ({ product }) => {
         </div>
       </Link>
 
-      {/* কন্টেন্টের অংশ (এখানে কোনো পরিবর্তন নেই) */}
+      {/* কন্টেন্টের অংশ  */}
       <div className="mt-3 text-left">
         <h3
           className="text-sm md:text-base font-medium text-base-content truncate group-hover:text-primary transition-colors"
@@ -44,7 +66,10 @@ const ProductCard = ({ product }) => {
               </p>
             )}
           </div>
-          <button className="btn btn-primary btn-sm btn-circle">
+          <button
+            onClick={handleAddToCart}
+            className="btn btn-primary btn-sm btn-circle"
+          >
             <HiOutlineShoppingCart className="h-5 w-5" />
           </button>
         </div>

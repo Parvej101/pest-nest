@@ -1,5 +1,6 @@
 "use client";
 
+import { useCart } from "@/context/CartContext";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,6 +11,7 @@ import { HiOutlineMenuAlt1, HiOutlineShoppingCart } from "react-icons/hi";
 import { IoSearchOutline } from "react-icons/io5";
 
 function Navbar() {
+  const { cartItems } = useCart();
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
 
@@ -44,6 +46,12 @@ function Navbar() {
       modalRef.current.close();
     }
   };
+
+  // কার্টে মোট কতগুলো প্রোডাক্ট আছে তার হিসাব
+  const totalItemsInCart = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   return (
     <>
@@ -125,14 +133,20 @@ function Navbar() {
               <button className="btn btn-ghost btn-circle">
                 <FiHeart className="h-6 w-6" />
               </button>
-              <button className="btn btn-ghost btn-circle">
+              <label
+                htmlFor="cart-drawer"
+                className="btn btn-ghost btn-circle drawer-button"
+              >
                 <div className="indicator">
                   <HiOutlineShoppingCart className="h-6 w-6" />
-                  <span className="badge badge-sm badge-primary indicator-item">
-                    8
-                  </span>
+                  {totalItemsInCart > 0 && (
+                    <span className="badge badge-sm badge-primary indicator-item">
+                      {totalItemsInCart}
+                    </span>
+                  )}
                 </div>
-              </button>
+              </label>
+
               <div className="dropdown dropdown-end">
                 <div
                   tabIndex={0}

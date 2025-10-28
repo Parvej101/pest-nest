@@ -12,6 +12,7 @@ import ContactFAB from "@/components/layout/ContactFAB";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import SidebarAuth from "@/components/layout/SidebarAuth";
+import CartSlider from "../cart/CartSlider";
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname();
@@ -59,9 +60,11 @@ export default function ClientLayout({ children }) {
     );
   }
 
-  // --- সাধারণ সাইটের লেআউট (অপরিবর্তিত) ---
   return (
-    <div className="drawer">
+    <div className="drawer  drawer-end">
+      {/* --- কার্ট Drawer --- */}
+      <input id="cart-drawer" type="checkbox" className="drawer-toggle" />
+      {/* --- মোবাইল মেনু Drawer --- */}
       <input id="mobile-drawer" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col min-h-screen">
         <Announcement />
@@ -111,6 +114,17 @@ export default function ClientLayout({ children }) {
             </li>
             <SidebarAuth />
           </ul>
+        </div>
+      </div>
+      {/* --- কার্ট স্লাইডার --- */}
+      <div className="drawer-side z-50">
+        <label
+          htmlFor="cart-drawer"
+          aria-label="close sidebar"
+          className="drawer-overlay"
+        ></label>
+        <div className="w-80 sm:w-96 min-h-full bg-base-100">
+          <CartSlider />
         </div>
       </div>
     </div>

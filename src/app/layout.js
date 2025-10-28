@@ -1,5 +1,6 @@
 import Providers from '@/components/Providers';
 import ClientLayout from '@/components/layout/ClientLayout';
+import { CartProvider } from '@/context/CartContext';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
@@ -15,9 +16,11 @@ export default function RootLayout({ children }) {
     <html lang="en" data-theme="abyss">
       <body className={inter.className}>
         <Providers>
-          <ClientLayout>
+         <CartProvider>
+           <ClientLayout>
             {children}
           </ClientLayout>
+         </CartProvider>
         </Providers>
       </body>
     </html>
