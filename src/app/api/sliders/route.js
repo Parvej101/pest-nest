@@ -5,14 +5,14 @@ import Slider from "../../../../models/Slider.js";
 export async function GET() {
   await dbConnect();
   try {
-    // পরিবর্তন: sort({ order: 1 }) সরানো হয়েছে
-    const sliders = await Slider.find({}).sort({ createdAt: -1 }); 
+    const sliders = await Slider.find({}).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, data: sliders });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
+// --- নতুন স্লাইড যোগ করার জন্য POST ফাংশন ---
 export async function POST(request) {
   await dbConnect();
   try {
