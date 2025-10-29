@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiPlus, FiTrash2, FiUploadCloud, FiX } from "react-icons/fi";
+import Swal from "sweetalert2";
 
 // পরিবর্তন ১: productToEdit নামে একটি নতুন prop গ্রহণ করা হচ্ছে
 const AddProductForm = ({
@@ -141,6 +142,29 @@ const AddProductForm = ({
     setFormData((prev) => ({ ...prev, variants: newVariants }));
   };
 
+  // Function to reset all form fields to their initial state
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      slug: "",
+      unitType: "Piece",
+      productCode: "",
+      category: "",
+      thumbnail: null,
+      gallery: [],
+      type: "single",
+      price: "",
+      stock: "",
+      isFeatured: false,
+      isTrending: false,
+      description: "",
+      variationType: "",
+      variants: [{ value: "", price: "", stock: "", image: null }],
+    });
+    setError(null);
+    setSuccess(null);
+  };
+
   // Main submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -201,11 +225,15 @@ const AddProductForm = ({
             `Failed to ${isEditMode ? "update" : "create"} product`
         );
 
-      setSuccess(`Product ${isEditMode ? "updated" : "added"} successfully!`);
+      // setSuccess(`Product ${isEditMode ? "updated" : "added"} successfully!`);
+      Swal.fire({
+        title: "Product added successfully!",
+        icon: "success",
+        draggable: true,
+      });
       router.refresh();
-      if (isEditMode) {
-        router.push("/admin/products");
-      }
+
+      resetForm();
     } catch (err) {
       setError(err.message);
     } finally {

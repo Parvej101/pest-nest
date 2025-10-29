@@ -10,31 +10,65 @@ import {
 import Swal from "sweetalert2";
 
 const ProductInfo = ({ product }) => {
-  const { addToCart, updateQuantity } = useCart();
+  const { cartItems, addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+
+  const isOutOfStock = product.stock <= 0;
+
+  // কার্টে এই প্রোডাক্টটির বর্তমান পরিমাণ কত
+  const cartItem = cartItems.find((item) => item._id === product._id);
+  const quantityInCart = cartItem ? cartItem.quantity : 0;
+
+  const remainingStock = (product.stock || 0) - quantityInCart;
+
   const handleAddToCart = () => {
-    // এখানে আমরা একটি একটি করে quantity সংখ্যক প্রোডাক্ট যোগ করব
+    // যোগ করার চেষ্টা করা পরিমাণটি কি স্টকের চেয়ে বেশি?
+    if (quantity > remainingStock) {
+      Swal.fire(
+        "Stock Limit!",
+        `You can only add ${remainingStock} more item(s) to the cart.`,
+        "warning"
+      );
+      return;
+    }
+
     for (let i = 0; i < quantity; i++) {
       addToCart(product._id, product);
     }
-
-    // সুন্দর নোটিফিকেশন
     Swal.fire({
       icon: "success",
       title: "Added to Cart!",
-      text: `${quantity} x ${product.name} has been added to your cart.`,
+      text: `${quantity} x ${product.name} has been added.`,
       showConfirmButton: false,
       timer: 2000,
     });
   };
+
+  const handleQuantityIncrease = () => {
+    // কোয়ান্টিটি remainingStock-এর চেয়ে বেশি হতে দেওয়া হবে না
+    if (quantity < remainingStock) {
+      setQuantity((prev) => prev + 1);
+    }
+  };
+
   return (
     <div className="lg:sticky lg:top-24">
-      {/* প্রোডাক্টের নাম */}
       <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight text-base-content">
         {product.name}
       </h1>
+      {/* পরিবর্তন: স্টকের তথ্য দেখানো হচ্ছে */}
+      <div className="mt-2">
+        {isOutOfStock ? (
+          <span className="badge badge-lg badge-error text-white">
+            Out of Stock
+          </span>
+        ) : (
+          <span className="badge badge-lg badge-success text-white">
+            {remainingStock} in stock
+          </span>
+        )}
+      </div>
 
-      {/* দাম */}
       <div className="mt-3 flex items-center gap-4">
         <p className="text-3xl text-primary font-bold">৳{product.price}</p>
         {product.oldPrice && (
@@ -44,14 +78,17 @@ const ProductInfo = ({ product }) => {
         )}
       </div>
 
-      {/* Quantity এবং Add to Cart বাটন */}
       <div className="mt-8">
         <div className="flex items-center gap-4">
           <label htmlFor="quantity" className="font-medium">
             Quantity:
           </label>
           <div className="join">
-            <button className="btn join-item" onClick={handleAddToCart}>
+            <button
+              className="btn join-item"
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              disabled={isOutOfStock}
+            >
               <HiOutlineMinus />
             </button>
             <input
@@ -61,15 +98,21 @@ const ProductInfo = ({ product }) => {
               readOnly
               className="input input-bordered join-item w-16 text-center"
             />
+            {/* পরিবর্তন: '+' বাটনটিও এখন স্টক অনুযায়ী নিষ্ক্রিয় হবে */}
             <button
               className="btn join-item"
-              onClick={() => setQuantity(quantity + 1)}
+              onClick={handleQuantityIncrease}
+              disabled={isOutOfStock || quantity >= remainingStock}
             >
               <HiOutlinePlus />
             </button>
           </div>
         </div>
-        <button className="btn btn-primary btn-lg w-full mt-8">
+        <button
+          onClick={handleAddToCart}
+          className="btn btn-primary btn-lg w-full mt-8"
+          disabled={isOutOfStock}
+        >
           <HiOutlineShoppingCart className="h-6 w-6" /> Add to Cart
         </button>
       </div>

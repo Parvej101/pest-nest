@@ -1,12 +1,12 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import useLocalStorageState from "use-local-storage-state";
 
-// 1. Context তৈরি করা
 const CartContext = createContext({});
 
-// 2. Provider কম্পোনেন্ট তৈরি করা
+
 export function CartProvider({ children }) {
   // localStorage-এ 'cart' নামে ডেটা সেভ হবে
   const [cartItems, setCartItems] = useLocalStorageState('cart', { defaultValue: [] });
@@ -43,12 +43,17 @@ export function CartProvider({ children }) {
     setCartItems(prevItems => {
       return prevItems.map(item => {
         if (item._id === productId) {
+           const availableStock = item.stock || 0;
           const newQuantity = item.quantity + amount;
-          // যদি পরিমাণ ০ বা তার কম হয়, তাহলে আইটেমটি সরানো হবে
+          
+           if (newQuantity > availableStock) {
+            Swal.fire('Limit Reached!', `Only ${availableStock} items are available.`, 'warning');
+            return item; // কোনো পরিবর্তন করা হবে না
+          }
           return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
         }
         return item;
-      }).filter(Boolean); // null আইটেমগুলো অ্যারে থেকে বাদ দেওয়া হচ্ছে
+      }).filter(Boolean);
     });
   }
 

@@ -7,12 +7,32 @@ import { HiOutlineShoppingCart } from "react-icons/hi";
 import Swal from "sweetalert2";
 
 const ProductCard = ({ product }) => {
-  const { addToCart } = useCart();
+  // পরিবর্তন ১: cartItems-কে Context থেকে আনা হচ্ছে
+  const { cartItems, addToCart } = useCart();
 
   if (!product || !product.imageSrc) {
     return null;
   }
+
+  // কার্টে এই প্রোডাক্টটির বর্তমান পরিমাণ কত, তা বের করা হচ্ছে
+  const cartItem = cartItems.find((item) => item._id === product._id);
+  const quantityInCart = cartItem ? cartItem.quantity : 0;
+
+  // প্রোডাক্টটির মোট স্টক কত এবং স্টকে আছে কিনা
+  const availableStock = product.stock || 0;
+  const isOutOfStock = availableStock <= quantityInCart;
+
   const handleAddToCart = () => {
+    // পরিবর্তন ২: addToCart কল করার আগেই এখানে স্টক চেক করা হচ্ছে
+    if (isOutOfStock) {
+      Swal.fire({
+        icon: "error",
+        title: "Stock Limit Reached!",
+        text: `You have already added the maximum available stock for "${product.name}".`,
+      });
+      return;
+    }
+
     addToCart(product._id, product);
 
     const Toast = Swal.mixin({
@@ -21,20 +41,12 @@ const ProductCard = ({ product }) => {
       showConfirmButton: false,
       timer: 2000,
       timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-      },
     });
-    Toast.fire({
-      icon: "success",
-      title: `${product.name} added to cart`,
-    });
+    Toast.fire({ icon: "success", title: `Added to cart` });
   };
 
   return (
     <div className="group">
-      {/* ছবির অংশ */}
       <Link href={`/product/${product.slug}`}>
         <div className="relative w-full aspect-3/4 rounded-lg overflow-hidden bg-base-200 shadow-sm group-hover:shadow-xl transition-shadow duration-300">
           <Image
@@ -44,10 +56,14 @@ const ProductCard = ({ product }) => {
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
             className="object-cover transition-transform duration-500 group-hover:scale-110"
           />
+          {/* পরিবর্তন ৩: এখন এটি কার্টের পরিমাণের উপর ভিত্তি করে 'Out of Stock' দেখাবে */}
+          {isOutOfStock && (
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+              <span className="badge badge-error text-white">Out of Stock</span>
+            </div>
+          )}
         </div>
       </Link>
-
-      {/* কন্টেন্টের অংশ  */}
       <div className="mt-3 text-left">
         <h3
           className="text-sm md:text-base font-medium text-base-content truncate group-hover:text-primary transition-colors"
@@ -66,9 +82,11 @@ const ProductCard = ({ product }) => {
               </p>
             )}
           </div>
+          {/* পরিবর্তন ৪: বাটনটি এখন isOutOfStock-এর উপর ভিত্তি করে নিষ্ক্রিয় হবে */}
           <button
             onClick={handleAddToCart}
             className="btn btn-primary btn-sm btn-circle"
+            disabled={isOutOfStock}
           >
             <HiOutlineShoppingCart className="h-5 w-5" />
           </button>
