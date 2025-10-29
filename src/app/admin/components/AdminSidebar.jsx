@@ -4,7 +4,13 @@ import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { FiBox, FiClipboard, FiGrid, FiSettings } from "react-icons/fi";
+import {
+  FiBox,
+  FiClipboard,
+  FiGrid,
+  FiPercent,
+  FiSettings,
+} from "react-icons/fi";
 
 import {
   productSubLinks,
@@ -17,6 +23,7 @@ const mainLinks = [
   { label: "Product", icon: FiBox, subLinks: productSubLinks },
   { label: "Settings", icon: FiSettings, subLinks: settingsSubLinks },
   { href: "/admin/orders", label: "Orders", icon: FiClipboard },
+  { href: "/admin/deals", label: "Deals", icon: FiPercent },
 ];
 
 const AdminSidebar = () => {
