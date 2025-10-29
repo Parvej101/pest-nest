@@ -22,6 +22,7 @@ export const authOptions = {
       if (adminEmails.includes(user.email)) {
         session.user.role = 'admin';
       }
+       session.user.id = user.id;
       return session;
     },
   },
@@ -29,3 +30,4 @@ export const authOptions = {
 
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
+

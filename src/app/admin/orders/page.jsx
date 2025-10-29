@@ -1,5 +1,5 @@
 import dbConnect from "../../../../lib/dbConnect";
-import Order from "../../../../models/Order";
+import Order from "../../../../models/Order.js";
 import OrderManager from "./components/OrderManager";
 
 async function getAllOrders() {

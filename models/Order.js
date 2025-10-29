@@ -2,7 +2,11 @@ import mongoose from 'mongoose';
 
 const OrderSchema = new mongoose.Schema({
   // যে ইউজার অর্ডার করেছে (যদি লগইন করা থাকে)
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  // পরিবর্তন: ref-এর মান 'User' (বড় হাতের U) হওয়াটা একটি স্ট্যান্ডার্ড প্র্যাকটিস
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User' // এটি mongoose.models.User-কে নির্দেশ করবে
+  },
   
   // কাস্টমারের তথ্য
   customerName: { type: String, required: true },

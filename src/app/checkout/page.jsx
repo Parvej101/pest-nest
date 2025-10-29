@@ -50,6 +50,7 @@ const CheckoutPage = () => {
     const orderData = {
       ...formData,
       shippingArea,
+      userId: session?.user?.id || null,
       orderItems: cartItems.map((item) => ({
         productId: item._id,
         name: item.name,
@@ -68,15 +69,28 @@ const CheckoutPage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
       });
+      const result = await res.json();
       if (!res.ok)
         throw new Error((await res.json()).error || "Failed to place order.");
+      // --- পরিবর্তন: গেস্ট অর্ডার আইডি সেভ করার নতুন লজিক ---
+      if (!session && result.data._id) {
+        // Local Storage থেকে পুরনো অর্ডার আইডিগুলো নেওয়া হচ্ছে
+        const guestOrders =
+          JSON.parse(localStorage.getItem("guest_orders")) || [];
+        // নতুন অর্ডার আইডিটি অ্যারের শুরুতে যোগ করা হচ্ছে
+        guestOrders.unshift(result.data._id);
+        // অ্যারেটি আবার Local Storage-এ সেভ করা হচ্ছে
+        localStorage.setItem("guest_orders", JSON.stringify(guestOrders));
+      }
+      // ----------------------------------------------------
+
       await Swal.fire(
         "Thank You!",
         "Your order has been placed successfully!",
         "success"
       );
       clearCart();
-      router.push("/");
+      router.push("/"); // অথবা একটি "Thank You" পেজে পাঠানো যেতে পারে
     } catch (error) {
       Swal.fire("Error!", error.message, "error");
     } finally {
