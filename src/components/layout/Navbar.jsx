@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { FiTag, FiUser } from "react-icons/fi";
+import { FiTag } from "react-icons/fi";
 import { HiOutlineMenuAlt1, HiOutlineShoppingCart } from "react-icons/hi";
 import { IoSearchOutline } from "react-icons/io5";
 
@@ -179,15 +179,19 @@ function Navbar() {
                   )}
                 </div>
               </label>
-              <div className="dropdown dropdown-end">
-                <div
-                  tabIndex={0}
-                  role="button"
-                  className="btn btn-ghost btn-circle avatar"
-                >
-                  {status === "loading" ? (
-                    <span className="loading loading-spinner"></span>
-                  ) : isLoggedIn ? (
+              {/* --- পরিবর্তন: এই অংশটিই এখন ডাইনামিক --- */}
+              {status === "loading" ? (
+                <div className="btn btn-ghost btn-circle">
+                  <span className="loading loading-spinner"></span>
+                </div>
+              ) : isLoggedIn ? (
+                // --- যদি লগইন করা থাকে ---
+                <div className="dropdown dropdown-end">
+                  <div
+                    tabIndex={0}
+                    role="button"
+                    className="btn btn-ghost btn-circle avatar"
+                  >
                     <div className="w-8 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
                       <Image
                         alt={session.user.name || "User Avatar"}
@@ -196,40 +200,50 @@ function Navbar() {
                         height={32}
                       />
                     </div>
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
-                      <FiUser className="h-5 w-5" />
-                    </div>
-                  )}
+                  </div>
+                  <ul
+                    tabIndex={0}
+                    className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52"
+                  >
+                    <li>
+                      <Link href="/profile">Profile</Link>
+                    </li>
+                    <li>
+                      <Link href="/orders">My Orders</Link>
+                    </li>
+                    <div className="divider my-1"></div>
+                    <li>
+                      <button onClick={() => signOut()}>Logout</button>
+                    </li>
+                  </ul>
                 </div>
-                <ul
-                  tabIndex={0}
-                  className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52"
-                >
-                  {isLoggedIn ? (
-                    <>
-                      <li>
-                        <Link href="/profile">Profile</Link>
-                      </li>
-                      <li>
-                        <Link href="/orders">My Orders</Link>
-                      </li>
-                      <div className="divider my-1"></div>
-                      <li>
-                        <button onClick={() => signOut()}>Logout</button>
-                      </li>
-                    </>
-                  ) : (
-                    <>
+              ) : (
+                // --- যদি লগইন করা না থাকে ---
+                <div className="flex items-center gap-2">
+                  <div className="dropdown dropdown-end">
+                    <div
+                      tabIndex={0}
+                      role="button"
+                      className="btn btn-ghost bg-gray-800"
+                    >
+                      Login
+                    </div>
+                    <ul
+                      tabIndex={0}
+                      className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+                    >
                       <li>
                         <button onClick={() => signIn("google")}>
                           Login with Google
                         </button>
                       </li>
-                    </>
-                  )}
-                </ul>
-              </div>
+                    </ul>
+                  </div>
+                  <Link href="/orders" className="btn btn-primary">
+                    My Order
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

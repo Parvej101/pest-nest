@@ -96,7 +96,7 @@ export default function ClientLayout({ children }) {
             <ContactFAB />
             <Footer />
           </div>
-          {/* --- মোবাইল সাইডবার --- */}
+          {/* --- পরিবর্তন: মোবাইল সাইডবার এখন আপনার নতুন ডিজাইন অনুযায়ী --- */}
           <div className="drawer-side z-50">
             <label
               htmlFor="mobile-drawer"
@@ -113,11 +113,12 @@ export default function ClientLayout({ children }) {
                   <IoClose className="h-6 w-6" />
                 </label>
               </div>
-              <ul className="space-y-1 text-lg">
+              <ul className="space-y-2 text-lg">
+                {/* ক্যাটাগরি ড্রপডাউন */}
                 <li>
                   <details>
-                    <summary className="text-lg">CATEGORIES</summary>
-                    <ul className="p-2 bg-base-100 rounded-t-none z-20 w-52">
+                    <summary>CATEGORIES</summary>
+                    <ul className="p-2">
                       {categories.map((cat) => (
                         <li key={cat._id}>
                           <Link
@@ -132,9 +133,8 @@ export default function ClientLayout({ children }) {
                     </ul>
                   </details>
                 </li>
-
-                <div className="divider my-4"></div>
-
+                <div className="divider my-2"></div>
+                {/* লগইন/লগআউট এবং ট্র্যাক অর্ডার */}
                 <SidebarAuth />
               </ul>
             </div>

@@ -142,7 +142,7 @@ const Footer = () => {
               <Link href="/faq" className="link link-hover">
                 FAQ
               </Link>
-              <Link href="/track-order" className="link link-hover">
+              <Link href="/orders" className="link link-hover">
                 Track Order
               </Link>
             </div>
