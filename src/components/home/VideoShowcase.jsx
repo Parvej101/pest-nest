@@ -1,19 +1,29 @@
-"use client";
-
 import Link from "next/link";
 
-// --- অ্যাডমিন প্যানেল থেকে ডেটা যেভাবে আসবে ---
-const videoData = {
-  // আপনার পছন্দের ইউটিউব ভিডিওর ১১-অক্ষরের ID
-  youtubeVideoId: "KId3r5dVwGk",
+// --- ডেটা আনার জন্য Helper ফাংশন ---
+async function getVideoSettings() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/settings`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.success ? data.data : null;
+  } catch (error) {
+    console.error("Error fetching video settings:", error);
+    return null;
+  }
+}
 
-  // বাটনের লিঙ্ক
-  buttonHref: "/product/interactive-cat-toy",
-};
+const VideoShowcase = async () => {
+  const settings = await getVideoSettings();
 
-const VideoShowcase = () => {
-  const videoSrc = `https://www.youtube.com/embed/${videoData.youtubeVideoId}?autoplay=1&mute=1&loop=1&playlist=${videoData.youtubeVideoId}&controls=1&fs=0&showinfo=0&modestbranding=1&rel=0`;
+  // যদি সেটিংস লোড না হয় বা ভিডিও ID না থাকে, তাহলে সেকশনটি দেখানো হবে না
+  if (!settings || !settings.videoShowcaseId) {
+    return null;
+  }
 
+  const videoSrc = `https://www.youtube.com/embed/${settings.videoShowcaseId}?autoplay=1&mute=1&loop=1&playlist=${settings.videoShowcaseId}&controls=0&fs=0&showinfo=0&modestbranding=1&rel=0`;
   return (
     <section className=" py-5 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

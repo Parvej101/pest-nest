@@ -8,7 +8,9 @@ import Order from "../../../../../models/Order.js";
 // --- একটি নির্দিষ্ট অর্ডার তার ID দিয়ে খুঁজে বের করার জন্য GET ফাংশন ---
 export async function GET(request, { params }) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  if (!session || session.user.role !== 'admin') {
+    return NextResponse.json({ success: false, error: "Unauthorized: Access Denied" }, { status: 403 });
+  }
   
   const { id } = params;
   await dbConnect();

@@ -7,6 +7,7 @@ export const productSubLinks = [
   { href: "/admin/products/stock", label: "Product Stock List", icon: FiArchive },
   { href: "/admin/categories", label: "Category", icon: FiList },
   { href: "/admin/variations", label: "Variation", icon: FiList },
+
 ];
 
 // Settings সেকশনের সাব-লিঙ্ক

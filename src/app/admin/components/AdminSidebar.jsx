@@ -10,8 +10,10 @@ import {
   FiGrid,
   FiPercent,
   FiSettings,
+  FiUsers,
 } from "react-icons/fi";
 
+import { useSession } from "next-auth/react";
 import {
   productSubLinks,
   settingsSubLinks,
@@ -24,10 +26,14 @@ const mainLinks = [
   { label: "Settings", icon: FiSettings, subLinks: settingsSubLinks },
   { href: "/admin/orders", label: "Orders", icon: FiClipboard },
   { href: "/admin/deals", label: "Deals", icon: FiPercent },
+  { href: "/admin/users", label: "Users", icon: FiUsers, adminOnly: true },
 ];
 
 const AdminSidebar = () => {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const userRole = session?.user?.role;
+
   const [activeSubMenu, setActiveSubMenu] = useState(null);
 
   const handleMenuClick = (label) => {
@@ -53,36 +59,46 @@ const AdminSidebar = () => {
           <Link href="/admin" className="text-2xl font-bold">
             PetNest
           </Link>
-          <span className="badge badge-primary badge-sm">Admin</span>
+          {/* ব্যাজটি এখন ডাইনামিক */}
+          <span className="badge badge-primary badge-sm capitalize">
+            {userRole}
+          </span>
         </div>
 
         <ul className="menu p-4">
-          {mainLinks.map((link, index) => (
-            <li key={index}>
-              {link.subLinks ? (
-                <button
-                  onClick={() => handleMenuClick(link.label)}
-                  className={`${
-                    (link.label === "Product" && isProductRouteActive) ||
-                    (link.label === "Settings" && isSettingsRouteActive)
-                      ? "active"
-                      : ""
-                  }`}
-                >
-                  <link.icon className="h-5 w-5" />
-                  {link.label}
-                </button>
-              ) : (
-                <Link
-                  href={link.href}
-                  className={`${pathname === link.href ? "active" : ""}`}
-                >
-                  <link.icon className="h-5 w-5" />
-                  {link.label}
-                </Link>
-              )}
-            </li>
-          ))}
+          {mainLinks.map((link, index) => {
+            // পরিবর্তন ২: Role-based rendering-এর লজিকটি এখানে যোগ করা হয়েছে
+            if (link.adminOnly && userRole !== "admin") {
+              return null; // যদি লিঙ্কটি adminOnly হয় এবং ইউজার admin না হয়, তাহলে কিছুই দেখানো হবে না
+            }
+
+            return (
+              <li key={index}>
+                {link.subLinks ? (
+                  <button
+                    onClick={() => handleMenuClick(link.label)}
+                    className={`${
+                      (link.label === "Product" && isProductRouteActive) ||
+                      (link.label === "Settings" && isSettingsRouteActive)
+                        ? "active"
+                        : ""
+                    }`}
+                  >
+                    <link.icon className="h-5 w-5" />
+                    {link.label}
+                  </button>
+                ) : (
+                  <Link
+                    href={link.href}
+                    className={`${pathname === link.href ? "active" : ""}`}
+                  >
+                    <link.icon className="h-5 w-5" />
+                    {link.label}
+                  </Link>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </aside>
 

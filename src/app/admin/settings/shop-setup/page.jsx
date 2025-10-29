@@ -9,6 +9,7 @@ import AnnouncementSettingsForm from "../components/AnnouncementSettingsForm";
 import ContactSettingsForm from "../components/ContactSettingsForm";
 import FooterSettingsForm from "../components/FooterSettingsForm";
 import MapSettingsForm from "../components/MapSettingsForm";
+import VideoSettingsForm from "../components/VideoSettingsForm";
 
 const ShopSetupPage = () => {
   const [settings, setSettings] = useState(null);
@@ -100,6 +101,8 @@ const ShopSetupPage = () => {
       <MapSettingsForm settings={settings} setSettings={setSettings} />
 
       <FooterSettingsForm settings={settings} setSettings={setSettings} />
+
+      <VideoSettingsForm settings={settings} setSettings={setSettings} />
     </div>
   );
 };

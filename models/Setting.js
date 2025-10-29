@@ -27,6 +27,17 @@ const SettingSchema = new mongoose.Schema({
   socialTiktok: { type: String, trim: true },
   paymentMethodsImageSrc: { type: String },
 
+   videoShowcaseId: { 
+    type: String, 
+    trim: true,
+    default: 'KId3r5dVwGk', // একটি ডিফল্ট ID
+  },
+  videoShowcaseLink: { 
+    type: String, 
+    trim: true,
+    default: '/shop', // একটি ডিফল্ট লিঙ্ক
+  },
+
 
 }, { timestamps: true });
 
