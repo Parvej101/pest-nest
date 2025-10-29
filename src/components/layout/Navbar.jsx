@@ -5,8 +5,8 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useRef } from "react";
-import { FiHeart, FiUser } from "react-icons/fi";
+import { useEffect, useRef, useState } from "react";
+import { FiTag, FiUser } from "react-icons/fi";
 import { HiOutlineMenuAlt1, HiOutlineShoppingCart } from "react-icons/hi";
 import { IoSearchOutline } from "react-icons/io5";
 
@@ -20,6 +20,26 @@ function Navbar() {
   const searchParams = useSearchParams();
   const currentSearch = searchParams.get("search") || "";
   const modalRef = useRef(null);
+
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/categories");
+        const data = await res.json();
+        if (data.success) setCategories(data.data);
+      } catch (error) {
+        console.error("Failed to fetch categories for navbar:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const totalItemsInCart = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   const handleSearchChange = (e) => {
     const searchTerm = e.target.value;
@@ -47,16 +67,10 @@ function Navbar() {
     }
   };
 
-  // কার্টে মোট কতগুলো প্রোডাক্ট আছে তার হিসাব
-  const totalItemsInCart = cartItems.reduce(
-    (total, item) => total + item.quantity,
-    0
-  );
-
   return (
     <>
       <header className="bg-base-200 border-b border-base-300 sticky top-0 z-30 text-base-content">
-        <div className="navbar px-4 sm:px-6 lg:max-w-7xl lg:px-8 lg:mx-auto">
+        <div className="navbar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="navbar-start">
             <label
               htmlFor="mobile-drawer"
@@ -83,15 +97,26 @@ function Navbar() {
                 height={35}
               />
             </Link>
+
+            {/* পরিবর্তন: ডেস্কটপ মেনুতে এখন শুধুমাত্র ক্যাটাগরি ড্রপডাউন */}
             <ul className="menu menu-horizontal px-1 font-semibold hidden lg:flex">
-              <li>
-                <Link href="/shop">SHOP</Link>
-              </li>
-              <li>
-                <Link href="/categories">CATEGORIES</Link>
-              </li>
-              <li>
-                <Link href="/deals">DEALS</Link>
+              <li tabIndex={0}>
+                <details>
+                  <summary className="text-lg">CATEGORIES</summary>
+                  <ul className="p-2 bg-base-100 rounded-t-none z-20 w-52">
+                    {categories.map((cat) => (
+                      <li key={cat._id}>
+                        <Link
+                          href={`/shop?category=${encodeURIComponent(
+                            cat.name
+                          )}`}
+                        >
+                          {cat.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
               </li>
             </ul>
           </div>
@@ -102,14 +127,22 @@ function Navbar() {
             >
               <IoSearchOutline className="h-6 w-6" />
             </button>
-            <button className="btn btn-ghost btn-circle lg:hidden">
+            <Link href="/deals" className="btn btn-ghost btn-circle lg:hidden">
+              <FiTag className="h-6 w-6" />
+            </Link>
+            <label
+              htmlFor="cart-drawer"
+              className="btn btn-ghost btn-circle drawer-button lg:hidden"
+            >
               <div className="indicator">
                 <HiOutlineShoppingCart className="h-6 w-6" />
-                <span className="badge badge-sm badge-primary indicator-item">
-                  8
-                </span>
+                {totalItemsInCart > 0 && (
+                  <span className="badge badge-sm badge-primary indicator-item">
+                    {totalItemsInCart}
+                  </span>
+                )}
               </div>
-            </button>
+            </label>
             <div className="hidden lg:flex items-center gap-2">
               <form
                 onSubmit={handleSearchSubmit}
@@ -130,9 +163,9 @@ function Navbar() {
                   <IoSearchOutline className="w-5 h-5 text-gray-400" />
                 </button>
               </form>
-              <button className="btn btn-ghost btn-circle">
-                <FiHeart className="h-6 w-6" />
-              </button>
+              <Link href="/deals" className="btn btn-ghost btn-circle">
+                <FiTag className="h-6 w-6" />
+              </Link>
               <label
                 htmlFor="cart-drawer"
                 className="btn btn-ghost btn-circle drawer-button"
@@ -146,7 +179,6 @@ function Navbar() {
                   )}
                 </div>
               </label>
-
               <div className="dropdown dropdown-end">
                 <div
                   tabIndex={0}

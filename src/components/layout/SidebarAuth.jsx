@@ -2,7 +2,7 @@
 
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { FiUser } from "react-icons/fi";
+import { FiShoppingCart, FiUser } from "react-icons/fi";
 
 const SidebarAuth = () => {
   const { data: session, status } = useSession();
@@ -23,6 +23,12 @@ const SidebarAuth = () => {
           <li>
             <Link href="/profile" className="flex items-center gap-3">
               <FiUser /> My Account
+            </Link>
+          </li>
+          <li>
+            <Link href="/orders" className="gap-3">
+              <FiShoppingCart />
+              My Order
             </Link>
           </li>
           <li>
