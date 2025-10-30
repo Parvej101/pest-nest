@@ -11,6 +11,11 @@ export function CartProvider({ children }) {
   // localStorage-এ 'cart' নামে ডেটা সেভ হবে
   const [cartItems, setCartItems] = useLocalStorageState('cart', { defaultValue: [] });
   
+   // কুপন এবং ডিসকাউন্টের জন্য state
+  const [coupon, setCoupon] = useLocalStorageState('coupon', { 
+    defaultValue: { code: '', discount: 0 } 
+  });
+
   // ক্লায়েন্ট সাইডে মাউন্ট হওয়ার পর state ঠিক করার জন্য
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
@@ -31,6 +36,34 @@ export function CartProvider({ children }) {
         return [...prevItems, { ...productDetails, _id: productId, quantity: 1 }];
       }
     });
+  }
+
+
+   // কুপন প্রয়োগ করার ডাইনামিক ফাংশন
+  async function applyCoupon(couponCode) {
+    if (!couponCode.trim()) {
+      setCoupon({ code: '', discount: 0 });
+      return { success: true };
+    }
+    try {
+      const res = await fetch(`/api/coupons/${couponCode.toUpperCase()}`);
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Invalid coupon code.");
+      
+      const couponData = result.data;
+      const subTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+      let discountAmount = 0;
+      if (couponData.discountType === 'percentage') {
+        discountAmount = subTotal * (couponData.discountValue / 100);
+      } else if (couponData.discountType === 'fixed') {
+        discountAmount = couponData.discountValue;
+      }
+      setCoupon({ code: couponData.code, discount: discountAmount });
+      return { success: true, discount: discountAmount, code: couponData.code };
+    } catch (err) {
+      setCoupon({ code: '', discount: 0 });
+      return { success: false, error: err.message };
+    }
   }
 
   // প্রোডাক্ট সরানো/ডিলিট করার ফাংশন
@@ -60,15 +93,18 @@ export function CartProvider({ children }) {
   // কার্ট খালি করার ফাংশন
   function clearCart() {
     setCartItems([]);
+    setCoupon({ code: '', discount: 0 });
   }
 
   return (
     <CartContext.Provider value={{
       cartItems: isClient ? cartItems : [],
+      coupon: isClient ? coupon : { code: '', discount: 0 },
       addToCart,
       removeFromCart,
       updateQuantity,
-      clearCart
+      clearCart,
+      applyCoupon, // applyCoupon ফাংশনটি এখন async
     }}>
       {children}
     </CartContext.Provider>

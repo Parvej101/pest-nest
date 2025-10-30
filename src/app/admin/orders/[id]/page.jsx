@@ -1,13 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FiArrowLeft } from "react-icons/fi";
-import OrderStatusChanger from "../../components/OrderStatusChanger"; // Client Component
+import OrderStatusChanger from "../../components/OrderStatusChanger";
 
-// সার্ভারেই সরাসরি ডেটাবেস থেকে অর্ডার খুঁজে বের করা হচ্ছে
 async function getOrderById(id) {
   try {
-    // সরাসরি ডেটাবেস কম্পোনেন্টগুলো ইম্পোর্ট করা হচ্ছে
-    // require ব্যবহার করা হচ্ছে কারণ এটি একটি Server Component-এর ভেতরে async ফাংশন
     const dbConnect = require("../../../../../lib/dbConnect.js").default;
     const Order = require("../../../../../models/Order.js").default;
     const mongoose = require("mongoose");
@@ -18,14 +15,12 @@ async function getOrderById(id) {
       return { error: "Invalid Order ID format" };
     }
 
-    // .lean() ব্যবহার করে Mongoose ডকুমেন্টকে সাধারণ JavaScript অবজেক্টে রূপান্তর করা হচ্ছে
     const order = await Order.findById(id).lean();
 
     if (!order) {
       return { error: `Order not found with ID: ${id}` };
     }
 
-    // Server Component-এ prop হিসেবে পাস করার জন্য ডেটাকে Serializable করা হচ্ছে
     return JSON.parse(JSON.stringify(order));
   } catch (error) {
     console.error("Failed to fetch order details:", error);
@@ -112,25 +107,30 @@ const OrderDetailsPage = async ({ params }) => {
             ))}
           </div>
           <div className="divider mt-6"></div>
-          <div className="space-y-2 text-right">
-            <p>
-              Subtotal:{" "}
-              <span className="font-semibold">
-                ৳{order.subTotal.toFixed(2)}
-              </span>
-            </p>
-            <p>
-              Shipping:{" "}
-              <span className="font-semibold">
+
+          {/* পরিবর্তন: মোট হিসাবের সেকশনটি এখন ডিসকাউন্ট দেখাবে */}
+          <div className="space-y-2 w-full sm:w-1/2 ml-auto text-right">
+            <div className="flex justify-between">
+              <p>Subtotal:</p>
+              <p className="font-semibold">৳{order.subTotal.toFixed(2)}</p>
+            </div>
+            {order.discount > 0 && (
+              <div className="flex justify-between text-success">
+                <p>Discount:</p>
+                <p className="font-semibold">- ৳{order.discount.toFixed(2)}</p>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <p>Shipping:</p>
+              <p className="font-semibold">
                 ৳{order.shippingCharge.toFixed(2)}
-              </span>
-            </p>
-            <p className="text-lg font-bold">
-              Grand Total:{" "}
-              <span className="text-primary">
-                ৳{order.grandTotal.toFixed(2)}
-              </span>
-            </p>
+              </p>
+            </div>
+            <div className="divider my-1"></div>
+            <div className="flex justify-between text-lg font-bold">
+              <p>Grand Total:</p>
+              <p className="text-primary">৳{order.grandTotal.toFixed(2)}</p>
+            </div>
           </div>
         </div>
 
@@ -166,7 +166,6 @@ const OrderDetailsPage = async ({ params }) => {
                 {order.status.replace("_", " ")}
               </span>
             </div>
-            {/* স্ট্যাটাস পরিবর্তনের জন্য Client Component */}
             <OrderStatusChanger
               orderId={order._id}
               currentStatus={order.status}

@@ -11,6 +11,7 @@ import {
   FiHome,
   FiPercent,
   FiSettings,
+  FiTag,
   FiUsers,
 } from "react-icons/fi";
 
@@ -28,6 +29,7 @@ const mainLinks = [
   { href: "/admin/orders", label: "Orders", icon: FiClipboard },
   { href: "/admin/deals", label: "Deals", icon: FiPercent },
   { href: "/admin/users", label: "Users", icon: FiUsers, adminOnly: true },
+  { href: "/admin/coupons", label: "Coupons", icon: FiTag },
 ];
 
 const AdminSidebar = () => {

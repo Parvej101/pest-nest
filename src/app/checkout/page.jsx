@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
 const CheckoutPage = () => {
-  const { cartItems, clearCart } = useCart();
+  const { cartItems, coupon, clearCart } = useCart();
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -38,7 +38,9 @@ const CheckoutPage = () => {
     0
   );
   const shippingCharge = shippingArea === "inside_dhaka" ? 70 : 120;
-  const grandTotal = subTotal + shippingCharge;
+
+  const discount = coupon?.discount || 0;
+  const grandTotal = subTotal + shippingCharge - discount;
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -47,6 +49,7 @@ const CheckoutPage = () => {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+
     const orderData = {
       ...formData,
       shippingArea,
@@ -60,6 +63,7 @@ const CheckoutPage = () => {
       })),
       subTotal,
       shippingCharge,
+      discount,
       grandTotal,
       userId: session?.user?.id,
     };
@@ -72,14 +76,14 @@ const CheckoutPage = () => {
       const result = await res.json();
       if (!res.ok)
         throw new Error((await res.json()).error || "Failed to place order.");
-      // --- পরিবর্তন: গেস্ট অর্ডার আইডি সেভ করার নতুন লজিক ---
+
       if (!session && result.data._id) {
         // Local Storage থেকে পুরনো অর্ডার আইডিগুলো নেওয়া হচ্ছে
         const guestOrders =
           JSON.parse(localStorage.getItem("guest_orders")) || [];
-        // নতুন অর্ডার আইডিটি অ্যারের শুরুতে যোগ করা হচ্ছে
+
         guestOrders.unshift(result.data._id);
-        // অ্যারেটি আবার Local Storage-এ সেভ করা হচ্ছে
+
         localStorage.setItem("guest_orders", JSON.stringify(guestOrders));
       }
       // ----------------------------------------------------
@@ -210,6 +214,7 @@ const CheckoutPage = () => {
         </div>
 
         {/* --- Right Column: Order Summary --- */}
+        {/* --- Right Column: Order Summary (আপডেট করা) --- */}
         <div className="lg:col-span-2 bg-base-100 p-6 rounded-lg shadow-md lg:sticky lg:top-24">
           <h2 className="text-xl font-bold mb-4 border-b border-base-300 pb-3">
             Your Order
@@ -251,6 +256,15 @@ const CheckoutPage = () => {
               <p>Subtotal</p>
               <p>৳{subTotal.toFixed(2)}</p>
             </div>
+
+            {/* পরিবর্তন ৪: ডিসকাউন্ট এখন এখানেও দেখানো হচ্ছে */}
+            {discount > 0 && (
+              <div className="flex justify-between text-success">
+                <p>Discount ({coupon.code}):</p>
+                <p>- ৳{discount.toFixed(2)}</p>
+              </div>
+            )}
+
             <div className="flex justify-between">
               <p>Shipping Charge</p>
               <p>৳{shippingCharge.toFixed(2)}</p>
