@@ -1,54 +1,50 @@
-import AddProductForm from "../../../components/AddProductForm";
+export const dynamic = "force-dynamic";
 
-// --- ডেটা আনার জন্য Helper ফাংশন ---
+import AddProductForm from "../../../../../components/AddProductForm";
+
+import dbConnect from "../../../../../../lib/dbConnect";
+import Category from "../../../../../../models/Category";
+import Product from "../../../../../../models/Product";
+import Variation from "../../../../../../models/Variation";
+
 async function getProductById(id) {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`,
-      { cache: "no-store" }
-    );
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.success ? data.data : null;
+    await dbConnect();
+    const product = await Product.findById(id);
+    return product ? JSON.parse(JSON.stringify(product)) : null;
   } catch (error) {
     console.error("Failed to fetch product for editing:", error);
     return null;
   }
 }
 
+// সব ক্যাটাগরি আনার ফাংশন
 async function getCategories() {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/categories`,
-      { cache: "no-store" }
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.success ? data.data : [];
+    await dbConnect();
+    const categories = await Category.find({}).sort({ name: 1 });
+    return JSON.parse(JSON.stringify(categories));
   } catch (error) {
+    console.error("Error fetching categories for edit page:", error);
     return [];
   }
 }
 
+// সব ভ্যারিয়েশন আনার ফাংশন
 async function getVariations() {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/variations`,
-      { cache: "no-store" }
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.success ? data.data : [];
+    await dbConnect();
+    const variations = await Variation.find({}).sort({ name: 1 });
+    return JSON.parse(JSON.stringify(variations));
   } catch (error) {
+    console.error("Error fetching variations for edit page:", error);
     return [];
   }
 }
-// ------------------------------------
 
 const EditProductPage = async ({ params }) => {
   const { id } = params;
 
-  // Promise.all দিয়ে একসাথে তিনটি API কল করা হচ্ছে
   const [productToEdit, categories, variations] = await Promise.all([
     getProductById(id),
     getCategories(),
@@ -68,7 +64,6 @@ const EditProductPage = async ({ params }) => {
     <div>
       <h1 className="text-3xl font-bold mb-8">Edit Product</h1>
 
-      {/* AddProductForm-কে "Edit Mode"-এ রেন্ডার করা হচ্ছে */}
       <AddProductForm
         productToEdit={productToEdit}
         categories={categories}

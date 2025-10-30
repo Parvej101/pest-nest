@@ -1,13 +1,14 @@
+import dbConnect from "../../../lib/dbConnect";
+import Page from "../../../models/Page";
+
 async function getPageContent(slug) {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/pages/${slug}`,
-      { next: { revalidate: 3600 } }
-    ); // 1 hour cache
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.success ? data.data : null;
+    await dbConnect();
+
+    const pageDoc = await Page.findOne({ slug });
+    return pageDoc ? JSON.parse(JSON.stringify(pageDoc)) : null;
   } catch (error) {
+    console.error(`Error fetching page content for slug: ${slug}`, error);
     return null;
   }
 }
@@ -27,7 +28,6 @@ export default async function DynamicPage({ params }) {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
       <h1 className="text-4xl font-bold mb-8">{page.title}</h1>
-      {/* dangerouslySetInnerHTML ব্যবহার করে HTML কন্টেন্ট রেন্ডার করা হচ্ছে */}
       <div
         className="prose lg:prose-xl max-w-none"
         dangerouslySetInnerHTML={{ __html: page.content }}
@@ -36,8 +36,26 @@ export default async function DynamicPage({ params }) {
   );
 }
 
-// মেটাডেটা ডাইনামিকভাবে জেনারেট করা
 export async function generateMetadata({ params }) {
   const page = await getPageContent(params.slug);
-  return { title: page?.title ? `${page.title} - PetNest` : "PetNest" };
+  if (!page) {
+    return { title: "Not Found - PetNest" };
+  }
+  return {
+    title: `${page.title} | PetNest`,
+  };
+}
+
+export async function generateStaticParams() {
+  try {
+    await dbConnect();
+    const pages = await Page.find({}, "slug");
+
+    return pages.map((page) => ({
+      slug: page.slug,
+    }));
+  } catch (error) {
+    console.error("Error generating static params for pages:", error);
+    return [];
+  }
 }

@@ -1,34 +1,33 @@
 import ProductCard from "@/components/shared/ProductCard";
-import Link from "next/link";
-import { HiOutlineChevronRight } from "react-icons/hi";
 import ProductImageGallery from "./components/ProductImageGallery";
 import ProductInfo from "./components/ProductInfo";
 
+import Link from "next/link";
+import { HiOutlineChevronRight } from "react-icons/hi";
+import dbConnect from "../../../../lib/dbConnect";
+import Product from "../../../../models/Product";
+
 async function getProductBySlug(slug) {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/products/${slug}`,
-      { cache: "no-store" }
-    );
-    if (!res.ok) return null; // প্রোডাক্ট খুঁজে না পাওয়া গেলে null রিটার্ন করা হবে
-    const data = await res.json();
-    return data.data;
+    await dbConnect();
+    const product = await Product.findOne({ slug });
+    return product ? JSON.parse(JSON.stringify(product)) : null;
   } catch (error) {
-    console.error("Failed to fetch single product:", error);
+    console.error(`Failed to fetch product for slug: ${slug}`, error);
     return null;
   }
 }
 
-async function getRelatedProducts(category, currentSlug) {
+async function getRelatedProducts(category, currentProductId) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.data
-      .filter((p) => p.category === category && p.slug !== currentSlug)
-      .slice(0, 5);
+    await dbConnect();
+    // একই ক্যাটাগরির অন্য প্রোডাক্ট খোঁজা হচ্ছে
+    const products = await Product.find({
+      category: category,
+      _id: { $ne: currentProductId },
+    }).limit(5); // সর্বোচ্চ ৫টি প্রোডাক্ট
+
+    return JSON.parse(JSON.stringify(products));
   } catch (error) {
     console.error("Failed to fetch related products:", error);
     return [];
@@ -41,7 +40,7 @@ const ProductDetailsPage = async ({ params }) => {
 
   if (!product) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center min-h-screen">
         <h1 className="text-2xl font-bold">
           Product with slug '{slug}' not found!
         </h1>
@@ -49,10 +48,10 @@ const ProductDetailsPage = async ({ params }) => {
     );
   }
 
-  // Related Products-ও API থেকে আনা হচ্ছে
+  // Related Products আনা হচ্ছে
   const relatedProducts = await getRelatedProducts(
     product.category,
-    product.slug
+    product._id
   );
 
   const breadcrumbs = [
@@ -79,7 +78,7 @@ const ProductDetailsPage = async ({ params }) => {
                     {breadcrumb.name}
                   </Link>
                   {i < breadcrumbs.length - 1 && (
-                    <HiOutlineChevronRight className="ml-2 h-4 w-4 flex-shrink-0" />
+                    <HiOutlineChevronRight className="ml-2 h-4 w-4 shrink-0" />
                   )}
                 </div>
               </li>
@@ -88,14 +87,12 @@ const ProductDetailsPage = async ({ params }) => {
         </nav>
 
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 lg:items-start">
-          {/* Server Component ডেটা পাস করছে Client Component-কে */}
           <ProductImageGallery
             thumbnailSrc={product.imageSrc}
             galleryImages={product.galleryImages}
             productName={product.name}
           />
           <div className="mt-10 lg:mt-0">
-            {/* Server Component ডেটা পাস করছে Client Component-কে */}
             <ProductInfo product={product} />
           </div>
         </div>
@@ -118,3 +115,21 @@ const ProductDetailsPage = async ({ params }) => {
 };
 
 export default ProductDetailsPage;
+
+// ===================================================================
+//  স্ট্যাটিক পাথ জেনারেট করা (পারফরম্যান্সের জন্য খুবই ভালো)
+// ===================================================================
+
+export async function generateStaticParams() {
+  try {
+    await dbConnect();
+    const products = await Product.find({}, "slug");
+
+    return products.map((product) => ({
+      slug: product.slug,
+    }));
+  } catch (error) {
+    console.error("Error generating static params for products:", error);
+    return [];
+  }
+}

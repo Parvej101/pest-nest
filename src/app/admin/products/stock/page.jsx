@@ -1,16 +1,19 @@
+export const dynamic = "force-dynamic";
+
 import StockManager from "../components/StockManager";
 
-// সার্ভারেই সব প্রোডাক্ট fetch করা হচ্ছে
+import dbConnect from "../../../../../lib/dbConnect";
+import Category from "../../../../../models/Category";
+import Product from "../../../../../models/Product";
+
 async function getAllProducts() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error("Failed to fetch products");
-    const data = await res.json();
-    return data.success ? data.data : [];
+    await dbConnect();
+
+    const products = await Product.find({}).sort({ createdAt: -1 });
+    return JSON.parse(JSON.stringify(products));
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching all products for stock page:", error);
     return [];
   }
 }
@@ -18,21 +21,19 @@ async function getAllProducts() {
 // সার্ভারেই সব ক্যাটাগরি fetch করা হচ্ছে
 async function getAllCategories() {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/categories`,
-      { cache: "no-store" }
-    );
-    if (!res.ok) throw new Error("Failed to fetch categories");
-    const data = await res.json();
-    return data.success ? data.data : [];
+    await dbConnect();
+    const categories = await Category.find({}).sort({ name: 1 });
+    return JSON.parse(JSON.stringify(categories));
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching all categories for stock page:", error);
     return [];
   }
 }
 
+// ===================================================================
+
 const StockPage = async () => {
-  // Promise.all দিয়ে একসাথে দুটি API কল করা হচ্ছে
+  // Promise.all দিয়ে একসাথে দুটি ডেটা ফেচিং ফাংশন চালানো হচ্ছে
   const [products, categories] = await Promise.all([
     getAllProducts(),
     getAllCategories(),
@@ -45,7 +46,7 @@ const StockPage = async () => {
       </div>
 
       {/* StockManager কম্পোনেন্টকে ডেটা পাস করে দেওয়া হচ্ছে */}
-      <StockManager initialProducts={products} categories={categories} />
+      <StockManager initialProducts={products} initialCategories={categories} />
     </div>
   );
 };

@@ -5,8 +5,8 @@ import { useMemo, useState } from "react";
 import { FiSave } from "react-icons/fi";
 import Swal from "sweetalert2";
 
-const StockManager = ({ initialProducts, categories }) => {
-  const [products, setProducts] = useState(initialProducts);
+const StockManager = ({ initialProducts, initialCategories }) => {
+  const [products, setProducts] = useState(initialProducts || []);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isSaving, setIsSaving] = useState({});
@@ -81,7 +81,7 @@ const StockManager = ({ initialProducts, categories }) => {
           className="select select-bordered w-full md:w-1/3"
         >
           <option value="all">All Categories</option>
-          {categories.map((cat) => (
+          {initialCategories.map((cat) => (
             <option key={cat._id} value={cat.name}>
               {cat.name}
             </option>

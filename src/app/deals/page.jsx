@@ -1,20 +1,32 @@
+export const dynamic = "force-dynamic";
+
 import CountdownTimer from "@/components/CountdownTimer";
 import ProductCard from "@/components/shared/ProductCard";
 import Link from "next/link";
 
+import dbConnect from "../../../lib/dbConnect";
+import Deal from "../../../models/Deal";
+
+// --- ডেটা আনার জন্য Helper ফাংশন ---
 async function getActiveDeal() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/deals`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.success ? data.data : null;
+    await dbConnect();
+
+    const now = new Date();
+
+    const activeDeal = await Deal.findOne({
+      isFeatured: true,
+      expiryDate: { $gt: now },
+    }).populate("productIds");
+
+    return activeDeal ? JSON.parse(JSON.stringify(activeDeal)) : null;
   } catch (error) {
     console.error("Failed to fetch active deal:", error);
     return null;
   }
 }
+
+// ===================================================================
 
 const DealsPage = async () => {
   const deal = await getActiveDeal();

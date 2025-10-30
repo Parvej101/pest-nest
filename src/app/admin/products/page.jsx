@@ -1,43 +1,41 @@
+// src/app/admin/products/page.js
+
+// পরিবর্তন ১: অ্যাডমিন পেজগুলোকে ডাইনামিক হিসেবে চিহ্নিত করা
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { FiPlusCircle } from "react-icons/fi";
-import ProductTable from "./components/ProductTable"; // আমাদের নতুন Client Component
+import ProductTable from "./components/ProductTable";
 
-// সার্ভারেই সব প্রোডাক্ট fetch করা হচ্ছে
+// --- ডাটাবেস এবং মডেল ইম্পোর্ট ---
+import dbConnect from "../../../../lib/dbConnect";
+import Category from "../../../../models/Category";
+import Product from "../../../../models/Product";
+
 async function getAllProducts() {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/products?status=all`,
-      {
-        cache: "no-store",
-      }
-    );
-    if (!res.ok) throw new Error("Failed to fetch products");
-    const data = await res.json();
-    return data.success ? data.data : [];
+    await dbConnect();
+
+    const products = await Product.find({}).sort({ createdAt: -1 });
+    return JSON.parse(JSON.stringify(products));
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching all products for admin:", error);
     return [];
   }
 }
 
-// সার্ভারেই সব ক্যাটাগরি fetch করা হচ্ছে
 async function getAllCategories() {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/categories`,
-      { cache: "no-store" }
-    );
-    if (!res.ok) throw new Error("Failed to fetch categories");
-    const data = await res.json();
-    return data.success ? data.data : [];
+    await dbConnect();
+    const categories = await Category.find({}).sort({ name: 1 });
+    return JSON.parse(JSON.stringify(categories));
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching all categories for admin:", error);
     return [];
   }
 }
 
 const ProductsPage = async () => {
-  // Promise.all দিয়ে একসাথে দুটি API কল করা হচ্ছে
   const [products, categories] = await Promise.all([
     getAllProducts(),
     getAllCategories(),
@@ -56,7 +54,7 @@ const ProductsPage = async () => {
       </div>
 
       {/* ProductTable কম্পোনেন্টকে ডেটা পাস করে দেওয়া হচ্ছে */}
-      <ProductTable products={products} categories={categories} />
+      <ProductTable initialProducts={products} initialCategories={categories} />
     </div>
   );
 };
