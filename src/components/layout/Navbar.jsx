@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { FiTag } from "react-icons/fi";
+import { FiGrid, FiTag } from "react-icons/fi";
 import { HiOutlineMenuAlt1, HiOutlineShoppingCart } from "react-icons/hi";
 import { IoSearchOutline } from "react-icons/io5";
 
@@ -14,6 +14,8 @@ function Navbar() {
   const { cartItems } = useCart();
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
+
+  const isAdmin = session?.user?.role === "admin";
 
   const { push } = useRouter();
   const pathname = usePathname();
@@ -187,34 +189,85 @@ function Navbar() {
               ) : isLoggedIn ? (
                 // --- যদি লগইন করা থাকে ---
                 <div className="dropdown dropdown-end">
-                  <div
-                    tabIndex={0}
-                    role="button"
-                    className="btn btn-ghost btn-circle avatar"
-                  >
-                    <div className="w-8 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                      <Image
-                        alt={session.user.name || "User Avatar"}
-                        src={session.user.image || "/images/default-avatar.png"}
-                        width={32}
-                        height={32}
-                      />
+                  {/* --- ড্রপডাউন ট্রিগার বাটন --- */}
+                  {/* এটি এখন লগইন স্ট্যাটাস অনুযায়ী ভিন্ন ভিন্ন বাটন দেখাবে */}
+                  {status === "loading" ? (
+                    <div className="btn btn-ghost btn-circle">
+                      <span className="loading loading-spinner"></span>
                     </div>
-                  </div>
+                  ) : isLoggedIn ? (
+                    // যদি লগইন করা থাকে, তাহলে প্রোফাইল ছবি দেখানো হবে
+                    <div
+                      tabIndex={0}
+                      role="button"
+                      className="btn btn-ghost btn-circle avatar"
+                    >
+                      <div className="w-8 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                        <Image
+                          alt={session.user.name || "User Avatar"}
+                          src={
+                            session.user.image || "/images/default-avatar.png"
+                          }
+                          width={32}
+                          height={32}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    // যদি লগইন করা না থাকে, তাহলে User আইকন দেখানো হবে
+                    <div
+                      tabIndex={0}
+                      role="button"
+                      className="btn btn-ghost btn-circle"
+                    >
+                      <FiUser className="h-6 w-6" />
+                    </div>
+                  )}
+
+                  {/* --- ড্রপডাউন মেনুর কন্টেন্ট --- */}
                   <ul
                     tabIndex={0}
-                    className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52"
+                    className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
                   >
-                    <li>
-                      <Link href="/profile">Profile</Link>
-                    </li>
-                    <li>
-                      <Link href="/orders">My Orders</Link>
-                    </li>
-                    <div className="divider my-1"></div>
-                    <li>
-                      <button onClick={() => signOut()}>Logout</button>
-                    </li>
+                    {isLoggedIn ? (
+                      // --- লগইন করা থাকলে যা যা দেখাবে ---
+                      <>
+                        {/* শুধুমাত্র অ্যাডমিনরাই এই লিঙ্কটি দেখতে পাবে */}
+                        {isAdmin && (
+                          <>
+                            <li>
+                              <Link href="/admin" className="justify-between">
+                                Admin Dashboard
+                                <FiGrid />
+                              </Link>
+                            </li>
+                            <div className="divider my-1"></div>
+                          </>
+                        )}
+                        <li>
+                          <Link href="/profile">Profile</Link>
+                        </li>
+                        <li>
+                          <Link href="/orders">My Orders</Link>
+                        </li>
+                        <div className="divider my-1"></div>
+                        <li>
+                          <button onClick={() => signOut()}>Logout</button>
+                        </li>
+                      </>
+                    ) : (
+                      // --- লগইন করা না থাকলে যা যা দেখাবে ---
+                      <>
+                        <li>
+                          <button onClick={() => signIn("google")}>
+                            Login with Google
+                          </button>
+                        </li>
+                        <li>
+                          <Link href="/orders">Track Order</Link>
+                        </li>
+                      </>
+                    )}
                   </ul>
                 </div>
               ) : (
