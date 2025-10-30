@@ -1,131 +1,107 @@
 "use client";
 
-import ProductCard from "@/components/shared/ProductCard";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import Pagination from "./Pagination";
+import { useCart } from "@/context/CartContext";
+import Image from "next/image";
+import Link from "next/link";
+import { HiOutlineShoppingCart } from "react-icons/hi";
+import Swal from "sweetalert2";
 
-const ITEMS_PER_PAGE = 9;
+const ProductGrid = ({ products }) => {
+  const { cartItems, addToCart } = useCart();
 
-const ProductGrid = ({ allProducts, allCategories }) => {
-  const searchParams = useSearchParams();
-  const initialCategory = searchParams.get("category") || "all";
+  const handleAddToCart = (product) => {
+    const cartItem = cartItems.find((item) => item._id === product._id);
+    const quantityInCart = cartItem ? cartItem.quantity : 0;
+    const availableStock = product.stock || 0;
 
-  const [selectedCategories, setSelectedCategories] = useState(
-    initialCategory === "all" ? ["all"] : [initialCategory]
-  );
-  const [sortOption, setSortOption] = useState("newest");
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const handleCategoryChange = (categoryName) => {
-    if (categoryName === "all") {
-      setSelectedCategories(["all"]);
+    if (quantityInCart >= availableStock) {
+      Swal.fire({
+        icon: "error",
+        title: "Out of Stock!",
+        text: `You have already added all available stock for ${product.name}.`,
+      });
       return;
     }
-    let newSelection = selectedCategories.filter((c) => c !== "all");
-    if (newSelection.includes(categoryName)) {
-      newSelection = newSelection.filter((c) => c !== categoryName);
-    } else {
-      newSelection.push(categoryName);
-    }
-    if (newSelection.length === 0) {
-      setSelectedCategories(["all"]);
-    } else {
-      setSelectedCategories(newSelection);
-    }
+
+    addToCart(product._id, product);
+
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "success",
+      title: `${product.name} added to cart!`,
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+    });
   };
 
-  const filteredAndSortedProducts = useMemo(() => {
-    let products = [...allProducts];
-    if (!selectedCategories.includes("all")) {
-      products = products.filter((p) =>
-        selectedCategories.includes(p.category)
-      );
-    }
-    if (sortOption === "price-low-to-high") {
-      products.sort((a, b) => a.price - b.price);
-    } else if (sortOption === "price-high-to-low") {
-      products.sort((a, b) => b.price - a.price);
-    }
-    return products;
-  }, [allProducts, selectedCategories, sortOption]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategories, sortOption]);
-
-  // পেজিনেশনের হিসাব -- এই অংশটি যোগ করতে হবে
-  const totalPages = Math.ceil(
-    filteredAndSortedProducts.length / ITEMS_PER_PAGE
-  );
-  const currentProducts = filteredAndSortedProducts.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  if (!products || products.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <h2 className="text-2xl font-semibold">No Products Found</h2>
+        <p className="mt-2 text-base-content/70">
+          Sorry, we couldn't find any products matching your filters.
+        </p>
+        <Link href="/shop">
+          <button className="btn btn-primary mt-6">
+            Clear Filters & Go Back
+          </button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-      {/* --- Left Sidebar: Filters --- */}
-      <aside className="lg:col-span-1 bg-base-200 p-6 rounded-lg h-fit lg:sticky lg:top-24">
-        <h2 className="text-xl font-bold mb-4">Categories</h2>
-        <div className="space-y-2">
-          <div className="form-control">
-            <label className="label cursor-pointer justify-start gap-3">
-              <input
-                type="checkbox"
-                className="checkbox checkbox-primary"
-                checked={selectedCategories.includes("all")}
-                onChange={() => handleCategoryChange("all")}
-              />
-              <span className="label-text">All</span>
-            </label>
-          </div>
-          {allCategories.map((cat) => (
-            <div key={cat._id} className="form-control">
-              <label className="label cursor-pointer justify-start gap-3">
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-primary"
-                  checked={selectedCategories.includes(cat.name)}
-                  onChange={() => handleCategoryChange(cat.name)}
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-8">
+      {products.map((product, index) => {
+        const cartItem = cartItems.find((item) => item._id === product._id);
+        const quantityInCart = cartItem ? cartItem.quantity : 0;
+        const availableStock = product.stock || 0;
+        const isOutOfStock = availableStock <= quantityInCart;
+
+        return (
+          <div key={product._id} className="group">
+            <Link href={`/product/${product.slug}`}>
+              <div className="relative w-full aspect-3/4 rounded-lg overflow-hidden bg-base-200 shadow-sm hover:shadow-xl transition-shadow">
+                <Image
+                  src={product.imageSrc || "/placeholder.png"}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 640px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  priority={index < 4}
                 />
-                <span className="label-text">{cat.name}</span>
-              </label>
+                {isOutOfStock && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <span className="badge badge-error text-white p-3 text-sm">
+                      Out of Stock
+                    </span>
+                  </div>
+                )}
+              </div>
+            </Link>
+            <div className="mt-3">
+              <h3 className="text-sm font-medium text-base-content truncate">
+                <Link href={`/product/${product.slug}`}>{product.name}</Link>
+              </h3>
+              <div className="mt-2 flex justify-between items-center">
+                <p className="font-bold text-primary text-lg">
+                  ৳{product.price}
+                </p>
+                <button
+                  onClick={() => handleAddToCart(product)}
+                  className="btn btn-primary btn-sm btn-circle"
+                  aria-label={`Add ${product.name} to cart`}
+                  disabled={isOutOfStock}
+                >
+                  <HiOutlineShoppingCart className="h-5 w-5" />
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
-      </aside>
-
-      {/* --- Right Side: Products Grid --- */}
-      <div className="lg:col-span-3">
-        <div className="flex justify-between items-center mb-6">
-          <p>
-            Showing {currentProducts.length} of{" "}
-            {filteredAndSortedProducts.length} products
-          </p>
-          <select
-            className="select select-bordered select-sm"
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-          >
-            <option value="newest">Sort by: Newest</option>
-            <option value="price-low-to-high">Price: Low to High</option>
-            <option value="price-high-to-low">Price: High to Low</option>
-          </select>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-          {currentProducts.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </div>
-
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          setCurrentPage={setCurrentPage}
-        />
-      </div>
+          </div>
+        );
+      })}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import ProductGrid from "./ProductGrid"; // আপনার বিদ্যমান ProductGrid কম্পোনেন্ট
+import ShopClient from "./ShopClient";
 
 // সার্ভারেই সব প্রোডাক্ট fetch করা হচ্ছে
 async function getAllProducts() {
@@ -10,7 +10,7 @@ async function getAllProducts() {
     const data = await res.json();
     return data.success ? data.data : [];
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching products:", error);
     return [];
   }
 }
@@ -26,24 +26,19 @@ async function getAllCategories() {
     const data = await res.json();
     return data.success ? data.data : [];
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching categories:", error);
     return [];
   }
 }
 
-const ShopPage = async () => {
-  const [products, categories] = await Promise.all([
-    getAllProducts(),
-    getAllCategories(),
-  ]);
+// মূল পেজ কম্পোনেন্ট (এটি একটি সার্ভার কম্পোনেন্ট)
+export default async function ShopPage() {
+  // ডাটা ফেচিং এখানে await দিয়ে করা হচ্ছে
+  const products = await getAllProducts();
+  const categories = await getAllCategories();
 
+  // ক্লায়েন্ট কম্পোনেন্টকে ডাটা পাস করা হচ্ছে
   return (
-    <div className="py-12">
-      <h1 className="text-4xl font-bold mb-8 text-center">Shop All</h1>
-      {/* ProductGrid-কে এখন ডেটা পাস করে দেওয়া হচ্ছে */}
-      <ProductGrid allProducts={products} allCategories={categories} />
-    </div>
+    <ShopClient initialProducts={products} initialCategories={categories} />
   );
-};
-
-export default ShopPage;
+}
