@@ -1,25 +1,19 @@
 import ProductCard from "@/components/shared/ProductCard";
 import Link from "next/link";
 
-// ধাপ ১: ডেটা আনার জন্য একটি async ফাংশন তৈরি করা
-// এই ফাংশনটি আমাদের বানানো API-কে কল করবে
+import dbConnect from "../../../lib/dbConnect";
+import Product from "../../../models/Product";
+
 async function getTrendingProducts() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
-      cache: "no-store",
-    });
+    await dbConnect();
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch products");
-    }
-
-    const data = await res.json();
-
-    // ডেটাবেস থেকে পাওয়া সব প্রোডাক্টের মধ্যে থেকে isTrending: true থাকা প্রোডাক্টগুলো ফিল্টার করা
-    const trendingProducts = data.data.filter((p) => p.isTrending).slice(0, 10);
-    return trendingProducts;
+    const products = await Product.find({ isTrending: true })
+      .sort({ createdAt: -1 })
+      .limit(10);
+    return JSON.parse(JSON.stringify(products));
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("Error fetching trending products:", error);
     return [];
   }
 }

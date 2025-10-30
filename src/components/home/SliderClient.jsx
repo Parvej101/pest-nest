@@ -1,9 +1,7 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-// আপনার CSS Module ফাইলটি ইম্পোর্ট করা হচ্ছে
 import styles from "./HeroSlider.module.css";
 
 const AUTOPLAY_DELAY = 4000;
@@ -88,7 +86,7 @@ const SliderClient = ({ slides }) => {
       {/* পরিবর্তন: শুধুমাত্র ১টির বেশি স্লাইড থাকলেই নেভিগেশন এবং টাইমার দেখানো হবে */}
       {slides.length > 1 && (
         <>
-          {/* Navigation Buttons (আপনার আসল কোড) */}
+          {/* Navigation Buttons  */}
           <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2 z-20">
             <button
               onClick={handlePrev}
@@ -104,7 +102,7 @@ const SliderClient = ({ slides }) => {
             </button>
           </div>
 
-          {/* Animated Timer (আপনার আসল কোড) */}
+          {/* Animated Timer  */}
           <div className={styles.timer_wrapper}>
             <svg className={styles.timer_svg} key={currentSlide}>
               <circle

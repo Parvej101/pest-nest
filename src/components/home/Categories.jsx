@@ -1,20 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 
+// --- ডাটাবেস এবং মডেল ইম্পোর্ট ---
+import dbConnect from "../../../lib/dbConnect";
+import Category from "../../../models/Category";
+
 async function getCategories() {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/categories`,
-      {
-        cache: "no-store",
-      }
-    );
-    if (!res.ok) {
-      console.error("Failed to fetch categories. Status:", res.status);
-      return [];
-    }
-    const data = await res.json();
-    return data.success ? data.data : [];
+    await dbConnect();
+
+    const categories = await Category.find().sort({ order: 1 }).limit(8);
+    return JSON.parse(JSON.stringify(categories));
   } catch (error) {
     console.error("Error fetching categories:", error);
     return [];
@@ -22,7 +18,6 @@ async function getCategories() {
 }
 
 const Categories = async () => {
-  // সার্ভারেই ডেটাবেস থেকে ক্যাটাগরিগুলো আনা হচ্ছে
   const categories = await getCategories();
 
   return (

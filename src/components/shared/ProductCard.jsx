@@ -7,7 +7,6 @@ import { HiOutlineShoppingCart } from "react-icons/hi";
 import Swal from "sweetalert2";
 
 const ProductCard = ({ product }) => {
-  // পরিবর্তন ১: cartItems-কে Context থেকে আনা হচ্ছে
   const { cartItems, addToCart } = useCart();
 
   if (!product || !product.imageSrc) {
@@ -23,7 +22,7 @@ const ProductCard = ({ product }) => {
   const isOutOfStock = availableStock <= quantityInCart;
 
   const handleAddToCart = () => {
-    // পরিবর্তন ২: addToCart কল করার আগেই এখানে স্টক চেক করা হচ্ছে
+    //  addToCart কল করার আগেই এখানে স্টক চেক করা হচ্ছে
     if (isOutOfStock) {
       Swal.fire({
         icon: "error",
@@ -56,7 +55,7 @@ const ProductCard = ({ product }) => {
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
             className="object-cover transition-transform duration-500 group-hover:scale-110"
           />
-          {/* পরিবর্তন ৩: এখন এটি কার্টের পরিমাণের উপর ভিত্তি করে 'Out of Stock' দেখাবে */}
+
           {isOutOfStock && (
             <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
               <span className="badge badge-error text-white">Out of Stock</span>
@@ -82,7 +81,7 @@ const ProductCard = ({ product }) => {
               </p>
             )}
           </div>
-          {/* পরিবর্তন ৪: বাটনটি এখন isOutOfStock-এর উপর ভিত্তি করে নিষ্ক্রিয় হবে */}
+
           <button
             onClick={handleAddToCart}
             className="btn btn-primary btn-sm btn-circle"

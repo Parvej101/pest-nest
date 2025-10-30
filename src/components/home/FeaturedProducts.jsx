@@ -1,14 +1,19 @@
 import ProductCard from "@/components/shared/ProductCard";
 import Link from "next/link";
 
+// --- ডাটাবেস এবং মডেল ইম্পোর্ট ---
+import dbConnect from "../../../lib/dbConnect";
+import Product from "../../../models/Product";
+
 async function getFeaturedProducts() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error("Failed to fetch products");
-    const data = await res.json();
-    return data.data.filter((p) => p.isFeatured).slice(0, 8);
+    await dbConnect();
+
+    const products = await Product.find({ isFeatured: true })
+      .sort({ createdAt: -1 })
+      .limit(8);
+
+    return JSON.parse(JSON.stringify(products));
   } catch (error) {
     console.error("Error fetching featured products:", error);
     return [];
