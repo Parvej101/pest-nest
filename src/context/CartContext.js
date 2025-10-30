@@ -104,7 +104,7 @@ export function CartProvider({ children }) {
       removeFromCart,
       updateQuantity,
       clearCart,
-      applyCoupon, // applyCoupon ফাংশনটি এখন async
+      applyCoupon, 
     }}>
       {children}
     </CartContext.Provider>
