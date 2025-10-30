@@ -1,8 +1,15 @@
+import { headers } from "next/headers";
 import Link from "next/link";
-import { FiArrowRight } from "react-icons/fi";
+import {
+  FiArrowRight,
+  FiBox,
+  FiDollarSign,
+  FiShoppingCart,
+  FiUsers,
+} from "react-icons/fi";
 
-// ড্যাশবোর্ড কার্ডের জন্য Helper কম্পোনেন্ট
-const StatCard = ({ title, value, color, icon }) => {
+// ড্যাশবোর্ড কার্ডের জন্য Helper কম্পונেন্ট (অপরিবর্তিত)
+const StatCard = ({ title, value, color, icon, link }) => {
   return (
     <div className={`p-6 rounded-lg shadow-md ${color}`}>
       <div className="flex justify-between items-start">
@@ -13,7 +20,10 @@ const StatCard = ({ title, value, color, icon }) => {
         <div className="text-4xl opacity-50">{icon}</div>
       </div>
       <div className="mt-4 border-t border-white/20 pt-2 text-sm">
-        <Link href="#" className="flex items-center gap-2 hover:underline">
+        <Link
+          href={link || "#"}
+          className="flex items-center gap-2 hover:underline"
+        >
           More info <FiArrowRight />
         </Link>
       </div>
@@ -21,35 +31,81 @@ const StatCard = ({ title, value, color, icon }) => {
   );
 };
 
-const AdminDashboardPage = () => {
-  // ভবিষ্যতে এই ডেটাগুলো API থেকে আসবে
-  const stats = [
-    { title: "Total Sales", value: "15430", color: "bg-green-500 text-white" },
+// --- ডেটা আনার জন্য Helper ফাংশন ---
+async function getDashboardStats() {
+  try {
+    // Server Component থেকে API কল করার সময় session cookie ফরোয়ার্ড করা
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/dashboard-stats`,
+      {
+        headers: new Headers(headers()),
+        cache: "no-store",
+      }
+    );
+    if (!res.ok) {
+      console.error("Failed to fetch dashboard stats. Status:", res.status);
+      return null;
+    }
+    const data = await res.json();
+    return data.success ? data.data : null;
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
+    return null;
+  }
+}
+
+// পেজটি এখন একটি async Server Component
+const AdminDashboardPage = async () => {
+  const stats = await getDashboardStats();
+
+  if (!stats) {
+    return (
+      <div className="alert alert-error">Could not load dashboard data.</div>
+    );
+  }
+
+  // ডেটাগুলোকে কার্ডে দেখানোর জন্য একটি অ্যারে তৈরি করা হচ্ছে
+  const statCards = [
     {
-      title: "Current Year Sales",
-      value: "15430",
+      title: "Total Sales",
+      value: `৳${stats.totalSales.toFixed(2)}`,
+      color: "bg-green-500 text-white",
+      icon: <FiDollarSign />,
+      link: "/admin/orders?status=completed",
+    },
+    {
+      title: "Today's Sales",
+      value: `৳${stats.todaysSales.toFixed(2)}`,
+      color: "bg-cyan-500 text-white",
+      icon: <FiDollarSign />,
+      link: "/admin/orders?status=completed",
+    },
+    {
+      title: "Pending Orders",
+      value: stats.pendingOrders,
       color: "bg-red-500 text-white",
+      icon: <FiShoppingCart />,
+      link: "/admin/orders?status=pending",
     },
     {
-      title: "Current Month Sales",
-      value: "15430",
-      color: "bg-gray-600 text-white",
+      title: "Total Products",
+      value: stats.totalProducts,
+      color: "bg-blue-500 text-white",
+      icon: <FiBox />,
+      link: "/admin/products",
     },
-    { title: "Today's Sales", value: "0", color: "bg-cyan-500 text-white" },
-    { title: "Completed Orders", value: "0", color: "bg-green-600 text-white" },
-    { title: "Accepted Orders", value: "0", color: "bg-gray-700 text-white" },
     {
-      title: "In Progress Orders",
-      value: "0",
-      color: "bg-cyan-600 text-white",
+      title: "Total Users",
+      value: stats.totalUsers,
+      color: "bg-purple-500 text-white",
+      icon: <FiUsers />,
+      link: "/admin/users",
     },
-    { title: "Pending Orders", value: "4", color: "bg-red-600 text-white" },
-    { title: "Canceled Orders", value: "0", color: "bg-red-700 text-white" },
   ];
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <div className="text-sm breadcrumbs">
           <ul>
@@ -61,8 +117,8 @@ const AdminDashboardPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {statCards.map((stat, index) => (
           <StatCard key={index} {...stat} />
         ))}
       </div>
