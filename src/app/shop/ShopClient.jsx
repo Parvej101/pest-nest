@@ -79,14 +79,28 @@ const ShopClient = ({ initialProducts, initialCategories }) => {
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get("search");
 
+  const initialCategoryFromUrl = searchParams.get("category");
+
   const [currentPage, setCurrentPage] = useState(1);
   const [price, setPrice] = useState(5000);
   const [sortOption, setSortOption] = useState("newest");
 
-  // পরিবর্তন ২: ডিফল্ট ক্যাটাগরি হিসেবে 'all' সেট করা হয়েছে
   const [selectedCategories, setSelectedCategories] = useState(["all"]);
 
-  // পরিবর্তন ৩: handleCategoryChange ফাংশনে "All" এর জন্য বিশেষ লজিক যোগ করা হয়েছে
+  // URL পরিবর্তন হলে selectedCategories স্টেট আপডেট করার জন্য useEffect
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get("category");
+    if (categoryFromUrl) {
+      setSelectedCategories([categoryFromUrl]);
+    } else {
+      // যদি URL-এ কোনো ক্যাটাগরি না থাকে, তাহলে 'all' সেট করা হবে
+      // এটি ঘটে যখন ব্যবহারকারী ফিল্টার ক্লিয়ার করে বা শপ পেজে সরাসরি আসে
+      if (!searchParams.has("category")) {
+        setSelectedCategories(["all"]);
+      }
+    }
+  }, [searchParams]);
+
   const handleCategoryChange = (categoryName) => {
     if (categoryName === "all") {
       setSelectedCategories(["all"]);
@@ -108,7 +122,6 @@ const ShopClient = ({ initialProducts, initialCategories }) => {
   const filteredAndSortedProducts = useMemo(() => {
     let products = initialProducts;
 
-    // পরিবর্তন ৪: ক্যাটাগরি ফিল্টারিং লজিক আপডেট করা হয়েছে
     if (!selectedCategories.includes("all")) {
       products = products.filter((p) =>
         selectedCategories.includes(p.category)
