@@ -8,6 +8,7 @@ import {
   FiBox,
   FiClipboard,
   FiGrid,
+  FiHome,
   FiPercent,
   FiSettings,
   FiUsers,
@@ -63,6 +64,9 @@ const AdminSidebar = () => {
           <span className="badge badge-primary badge-sm capitalize">
             {userRole}
           </span>
+          <Link href="/" className="ml-4">
+            <FiHome size={25}></FiHome>
+          </Link>
         </div>
 
         <ul className="menu p-4">
