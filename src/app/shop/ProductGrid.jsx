@@ -26,7 +26,7 @@ const ProductGrid = ({ products }) => {
       {products.map((product, index) => (
         <div key={product.id} className="group">
           <Link href={`/product/${product.slug}`}>
-            <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden bg-base-200 shadow-sm hover:shadow-xl transition-shadow">
+            <div className="relative w-full aspect-3/4 rounded-lg overflow-hidden bg-base-200 shadow-sm hover:shadow-xl transition-shadow">
               <Image
                 src={product.imageSrc}
                 alt={product.name}
