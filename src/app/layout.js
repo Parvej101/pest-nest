@@ -7,7 +7,10 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: "PetNest - Your Pet's Happiness Starts Here",
+  title: {
+    default: "PetNest - Your Pet's Happiness", 
+    template: '%s | PetNest',
+  },
   description: "A one-stop shop for all your pet needs.",
 };
 
