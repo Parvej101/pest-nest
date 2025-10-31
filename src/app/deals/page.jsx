@@ -5,17 +5,15 @@ import ProductCard from "@/components/shared/ProductCard";
 import Link from "next/link";
 
 import dbConnect from "../../../lib/dbConnect";
-import Deal from "../../../models/Deal";
+import Deal from "../../../models/Deal.js";
 
-// --- ডেটা আনার জন্য Helper ফাংশন ---
 async function getActiveDeal() {
   try {
     await dbConnect();
-
     const now = new Date();
 
     const activeDeal = await Deal.findOne({
-      isFeatured: true,
+      key: "active-deal",
       expiryDate: { $gt: now },
     }).populate("productIds");
 
@@ -25,8 +23,6 @@ async function getActiveDeal() {
     return null;
   }
 }
-
-// ===================================================================
 
 const DealsPage = async () => {
   const deal = await getActiveDeal();
