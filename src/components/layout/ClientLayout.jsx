@@ -11,29 +11,12 @@ import ContactFAB from "@/components/layout/ContactFAB";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 import SidebarAuth from "@/components/layout/SidebarAuth";
-import { useEffect, useState } from "react";
 import CartSlider from "../cart/CartSlider";
 
-export default function ClientLayout({ children }) {
+export default function ClientLayout({ children, categories }) {
   const pathname = usePathname();
   const isAdminRoute = pathname.startsWith("/admin");
 
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/categories");
-        const data = await res.json();
-        if (data.success) setCategories(data.data);
-      } catch (error) {
-        console.error("Failed to fetch categories for navbar:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  // --- অ্যাডমিন লেআউট (এখন এটি রেসপন্সিভ) ---
   if (isAdminRoute) {
     return (
       // md:drawer-open ক্লাসটি ডেস্কটপে সাইডবারকে সবসময় খোলা রাখে
@@ -87,7 +70,7 @@ export default function ClientLayout({ children }) {
           <input id="mobile-drawer" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content flex flex-col min-h-screen">
             <Announcement />
-            <Navbar />
+            <Navbar categories={categories} />
             <main className="grow">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {children}

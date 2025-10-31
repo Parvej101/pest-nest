@@ -5,12 +5,12 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { FiGrid, FiTag } from "react-icons/fi";
 import { HiOutlineMenuAlt1, HiOutlineShoppingCart } from "react-icons/hi";
 import { IoSearchOutline } from "react-icons/io5";
 
-function Navbar() {
+function Navbar({ categories }) {
   const { cartItems } = useCart();
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
@@ -22,21 +22,6 @@ function Navbar() {
   const searchParams = useSearchParams();
   const currentSearch = searchParams.get("search") || "";
   const modalRef = useRef(null);
-
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/categories");
-        const data = await res.json();
-        if (data.success) setCategories(data.data);
-      } catch (error) {
-        console.error("Failed to fetch categories for navbar:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
 
   const totalItemsInCart = cartItems.reduce(
     (total, item) => total + item.quantity,
