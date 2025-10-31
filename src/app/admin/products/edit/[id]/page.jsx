@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import AddProductForm from "../../../../../components/AddProductForm";
+import AddProductForm from "../../../../admin/components/AddProductForm";
 
 import dbConnect from "../../../../../../lib/dbConnect";
 import Category from "../../../../../../models/Category";

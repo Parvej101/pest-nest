@@ -1,5 +1,5 @@
-import dbConnect from "../../../lib/dbConnect";
-import Page from "../../../models/Page";
+import dbConnect from "../../../../lib/dbConnect";
+import Page from "../../../../models/Page";
 
 async function getPageContent(slug) {
   try {
