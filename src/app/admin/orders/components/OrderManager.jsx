@@ -34,7 +34,20 @@ const OrderManager = ({ initialOrders }) => {
   }, [orders, searchTerm, selectedStatus]);
 
   const getStatusBadge = (status) => {
-    /* ... getStatusBadge logic ... */
+    switch (status) {
+      case "pending":
+        return "badge-warning"; // হলুদ
+      case "accepted":
+        return "badge-info"; // নীল
+      case "in_progress":
+        return "badge-primary"; // প্রাইমারি রঙ
+      case "completed":
+        return "badge-success"; // সবুজ
+      case "canceled":
+        return "badge-error"; // লাল
+      default:
+        return "badge-ghost"; // ডিফল্ট
+    }
   };
 
   return (
