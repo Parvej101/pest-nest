@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import dbConnect from "../../../../lib/dbConnect";
 import Order from "../../../../models/Order.js";
 import OrderManager from "./components/OrderManager";
