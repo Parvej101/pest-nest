@@ -2,7 +2,6 @@
 
 import { useCart } from "@/context/CartContext";
 import { useSession } from "next-auth/react";
-
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -10,9 +9,10 @@ import Swal from "sweetalert2";
 
 const CheckoutPage = () => {
   const { cartItems, coupon, clearCart } = useCart();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession(); // status ইম্পোর্ট করা হয়েছে
   const router = useRouter();
 
+  // --- পরিবর্তন এখানে: একটি মাত্র state ব্যবহার করা হচ্ছে ---
   const [formData, setFormData] = useState({
     customerName: "",
     customerPhone: "",
@@ -23,27 +23,48 @@ const CheckoutPage = () => {
   const [shippingArea, setShippingArea] = useState("inside_dhaka");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // --- পরিবর্তন এখানে: লগইন করা ইউজারের জন্য ঠিকানা অটো-ফিল করার লজিক ---
   useEffect(() => {
-    if (session) {
-      setFormData((prev) => ({
-        ...prev,
-        customerName: session.user.name || "",
-        customerEmail: session.user.email || "",
-      }));
+    if (status === "authenticated" && session?.user?.id) {
+      const fetchUserData = async () => {
+        try {
+          const res = await fetch("/api/profile");
+          const data = await res.json();
+
+          if (data.success) {
+            const defaultAddress =
+              data.data.addresses?.find((addr) => addr.isDefault) ||
+              data.data.addresses?.[0];
+
+            setFormData({
+              customerName: data.data.name || "",
+              customerPhone: defaultAddress?.phone || "",
+              customerEmail: data.data.email || "",
+              shippingAddress: defaultAddress
+                ? `${defaultAddress.addressLine1}, ${defaultAddress.city} - ${defaultAddress.postalCode}`
+                : "",
+            });
+          }
+        } catch (error) {
+          console.error("Failed to fetch user profile for checkout", error);
+        }
+      };
+
+      fetchUserData();
     }
-  }, [session]);
+  }, [status, session]);
 
   const subTotal = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
   const shippingCharge = shippingArea === "inside_dhaka" ? 70 : 120;
-
   const discount = coupon?.discount || 0;
   const grandTotal = subTotal + shippingCharge - discount;
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handlePlaceOrder = async (e) => {
@@ -65,8 +86,8 @@ const CheckoutPage = () => {
       shippingCharge,
       discount,
       grandTotal,
-      userId: session?.user?.id,
     };
+
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
@@ -74,19 +95,14 @@ const CheckoutPage = () => {
         body: JSON.stringify(orderData),
       });
       const result = await res.json();
-      if (!res.ok)
-        throw new Error((await res.json()).error || "Failed to place order.");
+      if (!res.ok) throw new Error(result.error || "Failed to place order.");
 
       if (!session && result.data._id) {
-        // Local Storage থেকে পুরনো অর্ডার আইডিগুলো নেওয়া হচ্ছে
         const guestOrders =
           JSON.parse(localStorage.getItem("guest_orders")) || [];
-
         guestOrders.unshift(result.data._id);
-
         localStorage.setItem("guest_orders", JSON.stringify(guestOrders));
       }
-      // ----------------------------------------------------
 
       await Swal.fire(
         "Thank You!",
@@ -94,7 +110,7 @@ const CheckoutPage = () => {
         "success"
       );
       clearCart();
-      router.push("/"); // অথবা একটি "Thank You" পেজে পাঠানো যেতে পারে
+      router.push("/");
     } catch (error) {
       Swal.fire("Error!", error.message, "error");
     } finally {
@@ -117,7 +133,7 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto  sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold mb-8 text-center">Checkout</h1>
       <form
         onSubmit={handlePlaceOrder}
@@ -126,7 +142,7 @@ const CheckoutPage = () => {
         <div className="lg:col-span-3 bg-base-100 p-6 md:p-8 rounded-lg shadow-md space-y-4">
           <h2 className="text-xl font-bold mb-4">Billing Details</h2>
 
-          <div className="form-control w-full max-w-xs">
+          <div className="form-control w-full">
             <label className="label">
               <span className="label-text font-semibold ">Name *</span>
             </label>
@@ -140,8 +156,10 @@ const CheckoutPage = () => {
             />
           </div>
 
-          <div className="form-control w-full max-w-xs">
-            <label className="label">Phone *</label>
+          <div className="form-control w-full">
+            <label className="label">
+              <span className="label-text font-semibold">Phone *</span>
+            </label>
             <input
               type="tel"
               name="customerPhone"
@@ -152,8 +170,10 @@ const CheckoutPage = () => {
             />
           </div>
 
-          <div className="form-control w-full max-w-xs">
-            <label className="label">Email</label>
+          <div className="form-control w-full">
+            <label className="label">
+              <span className="label-text font-semibold">Email</span>
+            </label>
             <input
               type="email"
               name="customerEmail"
@@ -163,12 +183,13 @@ const CheckoutPage = () => {
             />
           </div>
 
-          {/* পরিবর্তন: Delivery Location এখন একটি সুন্দর গ্রিডে সাজানো */}
-          <div className="form-control ">
+          <div className="form-control">
             <label className="label">
-              <span className="label-text mb-2">Delivery Location *</span>
+              <span className="label-text mb-2 font-semibold">
+                Delivery Location *
+              </span>
             </label>
-            <div className="grid grid-cols-1/2 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <label className="cursor-pointer border border-base-300 rounded-lg p-3 flex items-center gap-3">
                 <input
                   type="radio"
@@ -182,7 +203,7 @@ const CheckoutPage = () => {
                   Inside Dhaka: <strong>70TK</strong>
                 </span>
               </label>
-              <label className="cursor-pointer border border-base-300 rounded-lg p-3 flex items-center gap-3 ">
+              <label className="cursor-pointer border border-base-300 rounded-lg p-3 flex items-center gap-3">
                 <input
                   type="radio"
                   name="shippingArea"
@@ -198,9 +219,9 @@ const CheckoutPage = () => {
             </div>
           </div>
 
-          <div className="form-control w-full ">
+          <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Address *</span>
+              <span className="label-text font-semibold">Address *</span>
             </label>
             <textarea
               name="shippingAddress"
@@ -213,8 +234,7 @@ const CheckoutPage = () => {
           </div>
         </div>
 
-        {/* --- Right Column: Order Summary --- */}
-        {/* --- Right Column: Order Summary (আপডেট করা) --- */}
+        {/* Right Column: Order Summary */}
         <div className="lg:col-span-2 bg-base-100 p-6 rounded-lg shadow-md lg:sticky lg:top-24">
           <h2 className="text-xl font-bold mb-4 border-b border-base-300 pb-3">
             Your Order
@@ -256,15 +276,12 @@ const CheckoutPage = () => {
               <p>Subtotal</p>
               <p>৳{subTotal.toFixed(2)}</p>
             </div>
-
-            {/* পরিবর্তন ৪: ডিসকাউন্ট এখন এখানেও দেখানো হচ্ছে */}
             {discount > 0 && (
               <div className="flex justify-between text-success">
                 <p>Discount ({coupon.code}):</p>
                 <p>- ৳{discount.toFixed(2)}</p>
               </div>
             )}
-
             <div className="flex justify-between">
               <p>Shipping Charge</p>
               <p>৳{shippingCharge.toFixed(2)}</p>
@@ -285,7 +302,7 @@ const CheckoutPage = () => {
                   className="radio radio-primary"
                   checked
                   readOnly
-                />{" "}
+                />
                 <span className="label-text font-bold">Cash On Delivery</span>
               </label>
             </div>
