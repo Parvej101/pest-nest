@@ -4,6 +4,7 @@ import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import clientPromise from "../../../../../lib/mongodb";
+import User from "../../../../../models/User";
 
 export const authOptions = {
   adapter: MongoDBAdapter(clientPromise),
@@ -15,24 +16,44 @@ export const authOptions = {
   ],
 
   session: {
-    strategy: "jwt", // JWT ব্যবহার করার জন্য নির্দেশ
+    strategy: "jwt",
   },
-  
- callbacks: {
+
+  callbacks: {
+    // --- পরিবর্তন এখানে: signIn ফাংশনটি যোগ করা হয়েছে ---
+    async signIn({ user, account }) {
+      // এই লাইনটি যেকোনো ইউজারকে লগইন করার অনুমতি দেবে।
+      // এটি ডেভেলপমেন্টের জন্য অপরিহার্য।
+      return true;
+    },
+
     // JWT টোকেন তৈরি বা আপডেট করার সময় এই ফাংশনটি চলে
-    async jwt({ token, user }) {
-      // যদি এটি প্রাথমিক সাইন-ইন হয়, তাহলে user অবজেক্টটি পাওয়া যাবে
+    async jwt({ token, user, trigger, session }) {
+      // 1. প্রাথমিক সাইন-ইন এর সময়:
       if (user) {
-        const adminEmails = process.env.ADMIN_EMAIL.split(',');
-        // ইউজারের role টোকেনের ভেতরে যোগ করা হচ্ছে
-        token.role = adminEmails.includes(user.email) ? 'admin' : 'user';
-        token.id = user.id; // ইউজারের _id যোগ করা হচ্ছে
+        // ডাটাবেস থেকে ইউজারের আসল role খোঁজা হচ্ছে
+        const dbUser = await User.findById(user.id);
+        const adminEmails = process.env.ADMIN_EMAIL.split(",");
+
+        // যদি ডাটাবেসে role থাকে, সেটি ব্যবহার করা হবে, না হলে ডিফল্ট লজিক
+        token.role =
+          dbUser?.role || (adminEmails.includes(user.email) ? "admin" : "user");
+        token.id = user.id;
       }
+
+      // 2. টোকেন রিফ্রেশ করার জন্য:
+      if (token.id) {
+        const dbUser = await User.findById(token.id);
+        if (dbUser) {
+          token.role = dbUser.role; // ডাটাবেস থেকে পাওয়া সর্বশেষ role দিয়ে টোকেন আপডেট করা হচ্ছে
+        }
+      }
+
       return token;
     },
+
     // ক্লায়েন্টের কাছে সেশন পাঠানোর সময় এই ফাংশনটি চলে
     async session({ session, token }) {
-      // টোকেন থেকে role এবং id নিয়ে সেশনে যোগ করা হচ্ছে
       if (session.user) {
         session.user.role = token.role;
         session.user.id = token.id;
@@ -44,4 +65,3 @@ export const authOptions = {
 
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
-

@@ -2,12 +2,13 @@
 
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { FiTruck, FiUser } from "react-icons/fi";
+import { FiGrid, FiTruck, FiUser } from "react-icons/fi";
 
 const SidebarAuth = () => {
   // useSession হুক ব্যবহার করে ইউজারের লগইন অবস্থা জানা হচ্ছে
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
+  const isAdmin = session?.user?.role === "admin";
 
   // যদি সেশন লোড হতে থাকে, তাহলে একটি লোডিং স্টেট দেখানো হবে
   if (status === "loading") {
@@ -22,6 +23,19 @@ const SidebarAuth = () => {
   if (isLoggedIn) {
     return (
       <>
+        {/* যদি ইউজার অ্যাডমিন হয়, তাহলে এই লিঙ্কটি দেখানো হবে */}
+        {isAdmin && (
+          <>
+            <li>
+              <Link href="/admin" className="flex items-center gap-3">
+                <FiGrid /> Admin Dashboard
+              </Link>
+            </li>
+            <div className="divider my-1"></div>
+          </>
+        )}
+
+        {/* নিচের অংশটি অপরিবর্তিত */}
         <li>
           <Link href="/profile" className="flex items-center gap-3">
             <FiUser /> My Account
