@@ -20,39 +20,33 @@ export const authOptions = {
   },
 
   callbacks: {
-    // --- পরিবর্তন এখানে: signIn ফাংশনটি যোগ করা হয়েছে ---
-    async signIn({ user, account }) {
-      // এই লাইনটি যেকোনো ইউজারকে লগইন করার অনুমতি দেবে।
-      // এটি ডেভেলপমেন্টের জন্য অপরিহার্য।
-      return true;
+    // --- এই signIn ফাংশনটি লগইনের অনুমতি দেওয়ার জন্য অপরিহার্য ---
+    async signIn({ user }) {
+      return true; // যেকোনো ভেরিফাইড ইউজারকে লগইন করতে দেবে
     },
+    // -----------------------------------------------------------
 
-    // JWT টোকেন তৈরি বা আপডেট করার সময় এই ফাংশনটি চলে
-    async jwt({ token, user, trigger, session }) {
-      // 1. প্রাথমিক সাইন-ইন এর সময়:
+    async jwt({ token, user }) {
+      // প্রাথমিক সাইন-ইন এর সময় role সেট করা
       if (user) {
-        // ডাটাবেস থেকে ইউজারের আসল role খোঁজা হচ্ছে
         const dbUser = await User.findById(user.id);
         const adminEmails = process.env.ADMIN_EMAIL.split(",");
-
-        // যদি ডাটাবেসে role থাকে, সেটি ব্যবহার করা হবে, না হলে ডিফল্ট লজিক
         token.role =
           dbUser?.role || (adminEmails.includes(user.email) ? "admin" : "user");
         token.id = user.id;
       }
 
-      // 2. টোকেন রিফ্রেশ করার জন্য:
+      // প্রতিবার সেশন চেক করার সময় role রিফ্রেশ করা
       if (token.id) {
         const dbUser = await User.findById(token.id);
         if (dbUser) {
-          token.role = dbUser.role; // ডাটাবেস থেকে পাওয়া সর্বশেষ role দিয়ে টোকেন আপডেট করা হচ্ছে
+          token.role = dbUser.role;
         }
       }
 
       return token;
     },
 
-    // ক্লায়েন্টের কাছে সেশন পাঠানোর সময় এই ফাংশনটি চলে
     async session({ session, token }) {
       if (session.user) {
         session.user.role = token.role;
